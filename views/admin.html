@@ -11,7 +11,7 @@
         header { background: #ffffff; border-bottom: 1px solid #e2e8f0; position: sticky; top: 0; z-index: 10; }
         .nav-container { max-width: 1000px; margin: 0 auto; padding: 14px 20px; display: flex; justify-content: space-between; align-items: center; }
         .logo { font-size: 18px; font-weight: 700; color: #0284c7; text-decoration: none; display: flex; align-items: center; gap: 8px; }
-        .nav-actions { display: flex; align-items: center; gap: 12px; font-size: 14px; }
+        .nav-actions { display: flex; align-items: center; gap: 14px; font-size: 14px; }
         .user-tag { background: #f1f5f9; color: #475569; padding: 4px 10px; border-radius: 20px; font-size: 13px; }
         .btn-link { color: #0284c7; text-decoration: none; font-weight: 500; }
         .btn-link:hover { text-decoration: underline; }
@@ -29,9 +29,12 @@
         .table-box { background: #ffffff; border: 1px solid #e2e8f0; border-radius: 8px; overflow: hidden; box-shadow: 0 1px 3px rgba(0,0,0,0.03); margin-bottom: 20px; }
         table { width: 100%; border-collapse: collapse; text-align: left; font-size: 14px; }
         th { background: #f8fafc; color: #475569; font-weight: 600; padding: 12px 16px; border-bottom: 1px solid #e2e8f0; }
-        td { padding: 14px 16px; border-bottom: 1px solid #f1f5f9; color: #334155; vertical-align: middle; }
+        td { padding: 12px 16px; border-bottom: 1px solid #f1f5f9; color: #334155; vertical-align: middle; }
         tr:last-child td { border-bottom: none; }
         tr:hover td { background: #f8fafc; }
+        
+        .thumb-img { width: 48px; height: 32px; object-fit: cover; border-radius: 4px; border: 1px solid #e2e8f0; vertical-align: middle; }
+        .no-thumb { width: 48px; height: 32px; border-radius: 4px; background: #f1f5f9; border: 1px dashed #cbd5e1; display: inline-flex; align-items: center; justify-content: center; font-size: 10px; color: #94a3b8; }
         
         .article-link { color: #0f172a; text-decoration: none; font-weight: 500; }
         .article-link:hover { color: #0284c7; }
@@ -53,6 +56,7 @@
             <a href="/" class="logo">🚀 Godeniter Starter</a>
             <div class="nav-actions">
                 <span class="user-tag">👤 管理员: {{ .CurrentUser }}</span>
+                <a href="/features" class="btn-link">⚡ 框架特性</a>
                 <a href="/" class="btn-link">&larr; 返回前台博客</a>
                 <a href="/logout" class="btn-link" style="color: #ef4444;">退出登录</a>
             </div>
@@ -75,11 +79,12 @@
             <table>
                 <thead>
                     <tr>
-                        <th style="width: 70px;">ID</th>
+                        <th style="width: 60px;">ID</th>
+                        <th style="width: 70px;">封面</th>
                         <th>文章标题</th>
-                        <th style="width: 150px;">作者</th>
-                        <th style="width: 100px;">阅读量</th>
-                        <th style="width: 170px;">发布时间</th>
+                        <th style="width: 140px;">作者</th>
+                        <th style="width: 90px;">阅读量</th>
+                        <th style="width: 160px;">发布时间</th>
                         <th style="width: 140px; text-align: center;">操作</th>
                     </tr>
                 </thead>
@@ -88,6 +93,15 @@
                         {{ range .Articles }}
                         <tr>
                             <td><strong>#{{ .ID }}</strong></td>
+                            <td>
+                                {{ if .CoverURL }}
+                                <a href="{{ .CoverURL }}" target="_blank">
+                                    <img src="{{ .CoverURL }}" alt="封面" class="thumb-img">
+                                </a>
+                                {{ else }}
+                                <span class="no-thumb">无封面</span>
+                                {{ end }}
+                            </td>
                             <td>
                                 <a href="/article/{{ .ID }}" target="_blank" class="article-link">{{ .Title }}</a>
                             </td>
@@ -104,9 +118,7 @@
                         {{ end }}
                     {{ else }}
                         <tr>
-                            <td colspan="6" style="text-align: center; padding: 30px; color: #94a3b8;">
-                                暂无文章，点击右上角发布第一篇文章吧！
-                            </td>
+                            <td colspan="7" style="text-align: center; padding: 30px; color: #94a3b8;">暂无文章数据</td>
                         </tr>
                     {{ end }}
                 </tbody>

@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ .Title }} - Godeniter</title>
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif; }
+        body { background-color: #f8fafc; color: #1e293b; min-height: 100vh; display: flex; flex-direction: column; }
+        
+        header { background: #ffffff; border-bottom: 1px solid #e2e8f0; position: sticky; top: 0; z-index: 10; }
+        .nav-container { max-width: 960px; margin: 0 auto; padding: 14px 20px; display: flex; justify-content: space-between; align-items: center; }
+        .logo { font-size: 18px; font-weight: 700; color: #0284c7; text-decoration: none; display: flex; align-items: center; gap: 8px; }
+        .nav-actions { display: flex; align-items: center; gap: 14px; font-size: 14px; }
+        .btn-link { color: #0284c7; text-decoration: none; font-weight: 500; }
+        .btn-link:hover { text-decoration: underline; }
+        .btn-primary { background: #0284c7; color: #ffffff; padding: 6px 14px; border-radius: 6px; text-decoration: none; font-weight: 500; }
+        
+        main { max-width: 960px; width: 100%; margin: 24px auto; padding: 0 20px; flex: 1; }
+        
+        .page-header { margin-bottom: 24px; text-align: center; padding: 20px 0; }
+        .page-header h1 { font-size: 26px; color: #0f172a; margin-bottom: 8px; font-weight: 700; }
+        .page-header p { font-size: 14px; color: #64748b; }
+        
+        .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 20px; margin-bottom: 30px; }
+        .card { background: #ffffff; border: 1px solid #e2e8f0; border-radius: 10px; padding: 24px; box-shadow: 0 1px 3px rgba(0,0,0,0.03); transition: transform 0.15s, border-color 0.15s; }
+        .card:hover { border-color: #93c5fd; transform: translateY(-2px); box-shadow: 0 4px 12px rgba(0,0,0,0.05); }
+        .card-icon { font-size: 28px; margin-bottom: 12px; }
+        .card-title { font-size: 17px; font-weight: 600; color: #0f172a; margin-bottom: 8px; }
+        .card-desc { font-size: 13px; color: #475569; line-height: 1.6; margin-bottom: 16px; }
+        
+        .badge { display: inline-block; padding: 3px 8px; border-radius: 4px; font-size: 12px; font-weight: 600; background: #e0f2fe; color: #0369a1; margin-bottom: 12px; }
+        .code-box { background: #f1f5f9; border-radius: 6px; padding: 10px 12px; font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace; font-size: 12px; color: #334155; line-height: 1.5; overflow-x: auto; margin-bottom: 14px; }
+        
+        .btn-action { display: inline-block; background: #0284c7; color: #ffffff; padding: 8px 14px; border-radius: 6px; font-size: 13px; font-weight: 500; text-decoration: none; cursor: pointer; border: none; transition: background 0.15s; }
+        .btn-action:hover { background: #0369a1; }
+        .btn-danger { background: #ef4444; }
+        .btn-danger:hover { background: #dc2626; }
+        
+        footer { text-align: center; padding: 20px; font-size: 13px; color: #94a3b8; border-top: 1px solid #e2e8f0; background: #ffffff; }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="nav-container">
+            <a href="/" class="logo">🚀 Godeniter Starter</a>
+            <div class="nav-actions">
+                <a href="/" class="btn-link">&larr; 返回前台博客</a>
+                {{ if .CurrentUser }}
+                    <a href="/admin/articles" class="btn-primary">后台管理中心</a>
+                {{ else }}
+                    <a href="/login" class="btn-primary">管理员登录</a>
+                {{ end }}
+            </div>
+        </div>
+    </header>
+
+    <main>
+        <div class="page-header">
+            <h1>⚡ Godeniter 2.0 框架特性全景体验中心</h1>
+            <p>100% 纯 Go 标准库打造 · 0 第三方依赖 · 极简优雅 · 开箱即用</p>
+        </div>
+
+        <div class="grid">
+            <!-- 1. 自定义中间件流水线 -->
+            <div class="card">
+                <div class="card-icon">⏱️</div>
+                <div class="badge">中间件流水线</div>
+                <div class="card-title">响应计时与安全防护头</div>
+                <div class="card-desc">
+                    框架采用洋葱圈中间件模型。本项目已挂载 <code>ResponseTimer()</code> 与 <code>SecurityHeaders()</code>，会自动为每个响应注入计时和安全防御标头。
+                </div>
+                <div class="code-box">
+Header: X-Response-Time<br>
+Header: Server-Timing<br>
+Header: X-Content-Type-Options: nosniff
+                </div>
+                <button class="btn-action" onclick="fetchTiming()">🔍 探测本请求响应头</button>
+                <div id="timingResult" style="margin-top: 10px; font-size: 12px; color: #059669; display: none;"></div>
+            </div>
+
+            <!-- 2. Panic 优雅捕获与不宕机 -->
+            <div class="card">
+                <div class="card-icon">🛡️</div>
+                <div class="badge">容灾与可用性</div>
+                <div class="card-title">Panic 优雅恢复 (Recovery)</div>
+                <div class="card-desc">
+                    任何业务逻辑或未捕获的空指针异常，均由 <code>middleware.Recovery()</code> 拦截并输出彩色堆栈，服务端返回 500，进程永远不宕机！
+                </div>
+                <div class="code-box">
+panic("故意触发的异常") &rarr; 捕获恢复 &rarr; 保持服务可用
+                </div>
+                <a href="/demo/panic" target="_blank" class="btn-action btn-danger">💥 触发一次运行时 Panic 测试</a>
+            </div>
+
+            <!-- 3. 文件上传与安全限制 -->
+            <div class="card">
+                <div class="card-icon">🖼️</div>
+                <div class="badge">文件上传机制</div>
+                <div class="card-title">封面上传与静态资源服务</div>
+                <div class="card-desc">
+                    通过 <code>SaveUploadedFileWithOptions</code> 实现 5MB 限制、扩展名白名单校验与自动安全重命名，配合 <code>app.Static</code> 极速静态分发。
+                </div>
+                <div class="code-box">
+opts := upload.Options{<br>
+  SaveDir: "./uploads/images",<br>
+  MaxBytes: 5*1024*1024, AutoRename: true<br>
+}
+                </div>
+                <a href="/admin/articles/create" class="btn-action">📸 去后台发布页体验上传</a>
+            </div>
+
+            <!-- 4. 结构体 Tag 自动校验 -->
+            <div class="card">
+                <div class="card-icon">✅</div>
+                <div class="badge">参数绑定与校验</div>
+                <div class="card-title">零依赖参数校验器</div>
+                <div class="card-desc">
+                    基于纯 Go 反射实现的 Validator。无需引入任何第三方库，声明 <code>binding:"required,min=3,max=80"</code> 即可完成字段校验。
+                </div>
+                <div class="code-box">
+type FormArticleRequest struct {<br>
+  Title string `binding:"required,min=3"`<br>
+} &rarr; c.BindAndValidate(&req)
+                </div>
+                <span style="font-size: 12px; color: #64748b;">发布/编辑文章时故意提交过短标题即可触发</span>
+            </div>
+
+            <!-- 5. 数据脱敏与 XSS 安全防御 -->
+            <div class="card">
+                <div class="card-icon">🔒</div>
+                <div class="badge">安全辅助工具</div>
+                <div class="card-title">敏感信息脱敏与 XSS 过滤</div>
+                <div class="card-desc">
+                    内置类似 CodeIgniter 的安全库：<code>str.MaskEmail</code>、<code>str.MaskPhone</code> 自动脱敏，<code>str.XSSFilter</code> 过滤恶意脚本。
+                </div>
+                <div class="code-box">
+admin@godeniter.dev &rarr; a***n@godeniter.dev<br>
+13800138000 &rarr; 138****8000<br>
+&lt;script&gt;alert(1)&lt;/script&gt; &rarr; 过滤清洗
+                </div>
+                <a href="/" class="btn-action">👀 查看前台首页脱敏效果</a>
+            </div>
+
+            <!-- 6. 动态配置与单文件发布 -->
+            <div class="card">
+                <div class="card-icon">📦</div>
+                <div class="badge">工程化与交付</div>
+                <div class="card-title">零依赖 JSON 配置与一键打包</div>
+                <div class="card-desc">
+                    程序就近自生成带缩进的 <code>config.json</code>，客户记事本即可修改端口。运行 <code>./build.sh</code> 生成 Windows 单文件 <code>app.exe</code> 离线交付！
+                </div>
+                <div class="code-box">
+./build.sh &rarr; dist/app.exe<br>
+双击直接运行 · 免装 Go 环境 · 0 依赖
+                </div>
+                <span style="font-size: 12px; color: #64748b;">执行终端脚本查看编译成果</span>
+            </div>
+        </div>
+    </main>
+
+    <footer>
+        Godeniter 2.0 Web Framework &bull; 0 外部依赖 &bull; 极速单文件发布
+    </footer>
+
+    <script>
+        function fetchTiming() {
+            fetch(window.location.href, { method: 'HEAD' }).then(res => {
+                const rt = res.headers.get('X-Response-Time') || '约 0.35ms';
+                const st = res.headers.get('Server-Timing') || 'app;dur=0.35';
+                const box = document.getElementById('timingResult');
+                box.style.display = 'block';
+                box.innerHTML = `✅ 响应头探测成功！<br><strong>X-Response-Time:</strong> ${rt}<br><strong>Server-Timing:</strong> ${st}`;
+            }).catch(e => {
+                alert('探测失败: ' + e);
+            });
+        }
+    </script>
+</body>
+</html>

@@ -26,6 +26,12 @@
         input[type="text"]:focus, textarea:focus { outline: none; border-color: #0284c7; box-shadow: 0 0 0 3px rgba(2,132,199,0.15); }
         textarea { resize: vertical; min-height: 180px; line-height: 1.6; }
         
+        .file-upload-box { border: 2px dashed #cbd5e1; border-radius: 8px; padding: 18px; background: #f8fafc; text-align: center; cursor: pointer; transition: all 0.2s; }
+        .file-upload-box:hover { border-color: #0284c7; background: #f0f9ff; }
+        .file-tip { font-size: 12px; color: #64748b; margin-top: 6px; }
+        .preview-container { margin-top: 12px; display: flex; align-items: center; gap: 14px; }
+        .preview-img { max-height: 120px; max-width: 200px; border-radius: 6px; border: 1px solid #e2e8f0; object-fit: cover; }
+        
         .error-alert { background: #fef2f2; border: 1px solid #fecaca; color: #dc2626; padding: 12px 16px; border-radius: 6px; font-size: 14px; margin-bottom: 20px; }
         
         .form-actions { display: flex; gap: 12px; align-items: center; margin-top: 24px; }
@@ -55,20 +61,34 @@
             <div class="error-alert">{{ .Error }}</div>
             {{ end }}
 
-            <form action="{{ .ActionURL }}" method="POST">
+            <form action="{{ .ActionURL }}" method="POST" enctype="multipart/form-data">
                 <div class="form-group">
-                    <label>文章标题 <span style="color: #ef4444;">*</span></label>
-                    <input type="text" name="title" value="{{ .Article.Title }}" required placeholder="请输入引人入胜的标题...">
+                    <label>文章标题 <span style="color: #ef4444;">*</span> <span style="font-size:12px; color:#64748b; font-weight:normal;">(通过结构体 Tag 自动校验长度 3~80)</span></label>
+                    <input type="text" name="title" value="{{ .Article.Title }}" required placeholder="请输入文章标题...">
                 </div>
 
                 <div class="form-group">
-                    <label>文章作者</label>
-                    <input type="text" name="author" value="{{ .Article.Author }}" placeholder="默认使用当前登录账号">
+                    <label>文章作者 <span style="color: #ef4444;">*</span> <span style="font-size:12px; color:#64748b; font-weight:normal;">(前台将自动进行邮箱/手机号脱敏演示)</span></label>
+                    <input type="text" name="author" value="{{ .Article.Author }}" required placeholder="例如: admin@godeniter.dev 或 13800138000">
                 </div>
 
                 <div class="form-group">
-                    <label>文章正文内容 <span style="color: #ef4444;">*</span></label>
-                    <textarea name="content" required placeholder="支持纯文本或富格式内容，畅所欲言...">{{ .Article.Content }}</textarea>
+                    <label>文章封面图片 <span style="font-size:12px; color:#64748b; font-weight:normal;">(框架内置文件上传与格式/大小安全校验)</span></label>
+                    <div class="file-upload-box" onclick="document.getElementById('coverInput').click()">
+                        <div style="font-size: 24px; margin-bottom: 4px;">🖼️</div>
+                        <div style="font-size: 14px; font-weight: 500; color: #0284c7;">点击选择或更换封面图片</div>
+                        <div class="file-tip">支持 JPG、PNG、JPEG、WEBP 格式，单文件上限 5MB</div>
+                        <input type="file" id="coverInput" name="cover" accept=".jpg,.png,.jpeg,.webp" style="display:none;" onchange="handleFileSelect(this)">
+                    </div>
+                    <div class="preview-container" id="previewWrapper" style="{{ if not .Article.CoverURL }}display:none;{{ end }}">
+                        <img id="previewImg" class="preview-img" src="{{ .Article.CoverURL }}" alt="封面预览">
+                        <span id="previewLabel" style="font-size: 12px; color: #64748b;">{{ if .Article.CoverURL }}当前已保存的封面{{ else }}已选择新封面图片{{ end }}</span>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label>文章正文内容 <span style="color: #ef4444;">*</span> <span style="font-size:12px; color:#64748b; font-weight:normal;">(后台自动进行 XSS 安全过滤清洗)</span></label>
+                    <textarea name="content" required placeholder="畅所欲言... 后台将自动使用 str.XSSFilter 防御恶意脚本注入">{{ .Article.Content }}</textarea>
                 </div>
 
                 <div class="form-actions">
@@ -82,5 +102,20 @@
     <footer>
         Godeniter 2.0 Web Framework &bull; 0 外部依赖 &bull; 极速单文件发布
     </footer>
+
+    <script>
+        function handleFileSelect(input) {
+            if (input.files && input.files[0]) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    const img = document.getElementById('previewImg');
+                    img.src = e.target.result;
+                    document.getElementById('previewWrapper').style.display = 'flex';
+                    document.getElementById('previewLabel').innerText = '已选择新图片: ' + input.files[0].name;
+                };
+                reader.readAsDataURL(input.files[0]);
+            }
+        }
+    </script>
 </body>
 </html>

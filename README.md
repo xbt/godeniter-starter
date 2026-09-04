@@ -76,26 +76,33 @@ go run main.go
 
 ---
 
-## 🌟 核心演示功能 (Demo Features)
+## 🌟 核心演示功能 (Full Features Demos)
 
-脚手架内置了一套完整的现代化轻量博客/内容管理系统，采用清新典雅的**浅色调 UI（Light Theme）**，涵盖日常 Web 开发标配能力：
+脚手架内置了一套完整的现代化轻量博客/内容管理系统，采用清新典雅的**浅色调 UI（Light Theme）**，全面覆盖 Godeniter 框架在实际企业级业务中可能用到的核心功能点：
 
-1. **首页分页与搜索联动**：
-   - 预置 **8 篇**精品架构与实战文章，默认每页展示 **5 篇**（直观呈现 `第 1 页 / 第 2 页` 分页场景）；
-   - 支持前台顶部搜索框，输入关键词即可对标题和正文进行模糊检索，并与分页参数深度联动。
-2. **文章详情页 (`/article/:id`)**：
-   - 点击文章卡片或标题进入专属详情页，展示完整的正文排版、作者脱敏信息、发布时间与阅读计数；
-   - 每次访问详情页自动累加阅读量 (`views`)，展示路由动态参数解析能力。
-3. **后台文章管理与完整增删改查 (`/admin/articles`)**：
-   - 标配登录权限拦截，未登录自动跳转到 `/login`；
-   - **列表管理**：表格化直观管理所有文章，支持搜索、查看阅读数；
-   - **发布新文章**：支持富文本正文录入与字段校验；
-   - **编辑更新**：动态回显旧数据并保存修改；
-   - **快速删除**：提供一键确认删除。
-4. **全套现代化浅色调设计**：
-   - 采用高级浅灰背景 (`#f8fafc`)、白底圆角卡片、柔和阴影与品牌蓝按钮，阅读体验清爽舒适。
-5. **开箱即用的自动化测试**：
-   - 包含 `main_test.go`，执行 `go test -v .` 即可秒级完成所有页面渲染、搜索、分页、登录鉴权及后台 CRUD 的端到端测试。
+1. **文件上传全链路演示 (Upload & Static Serv)**：
+   - **封面图片上传**：发布/编辑文章表单支持本地选择封面图片上传，前端即时图片预览；
+   - **服务端安全校验**：使用框架内置 `c.SaveUploadedFileWithOptions`，实施 5MB 上限限制、`.jpg/.png/.jpeg/.webp` 格式白名单校验，并自动重命名保存至 `./uploads/images/`；
+   - **多端封面展示**：首页列表图文自适应卡片、详情页高清头图以及后台表格封面缩略图；同时提供独立 RESTful 上传接口 `/api/v1/upload`。
+2. **自定义业务中间件流水线 (Custom Middleware)**：
+   - **路由守卫中间件 (`AuthRequired`)**：保护 `/admin` 路由组，未登录拦截并携带 Flash 提示重定向；
+   - **响应耗时中间件 (`ResponseTimer`)**：自动记录每个请求的处理耗时，向响应头注入 `X-Response-Time` 与 `Server-Timing`；
+   - **基础安全头中间件 (`SecurityHeaders`)**：自动注入 `X-Content-Type-Options: nosniff`、`X-Frame-Options: SAMEORIGIN`、`X-XSS-Protection` 等安全标头。
+3. **零依赖参数绑定与结构体 Tag 校验 (Binding & Validation)**：
+   - 基于纯 Go 标准库与反射实现的轻量验证器，无需第三方库；
+   - 表单提交声明 `binding:"required,min=3,max=80"`，校验失败自动在 Web 页面友好回显红字提示。
+4. **企业级数据安全与脱敏实战 (Utils & Security)**：
+   - **正文防 XSS 过滤**：发布与编辑正文自动执行 `str.XSSFilter` 过滤恶意脚本；
+   - **敏感联系方式脱敏**：作者手机号/邮箱智能掩码脱敏（`str.MaskPhone` / `str.MaskEmail`）；
+   - **内容摘要截断**：卡片摘要使用 `str.Truncate` 安全截断。
+5. **前台 8 篇精品文章预置与 5 条/页分页**：
+   - 倒序呈现 8 篇实战文章，直观展示 `第 1 / 2 页` 分页场景，支持上一页/下一页无缝翻页；
+   - 顶部搜索框支持标题与内容模糊检索，并与分页深度联动。
+6. **框架特性体验中心 (`/features`) 与 Panic 优雅容灾**：
+   - 顶部导航设有“⚡ 框架特性”专区，可视化展示各功能点；
+   - 提供 `/demo/panic` 测试端点，点击可验证 `Recovery()` 中间件优雅捕获运行时异常并输出彩色堆栈，**进程永不宕机**。
+7. **开箱即用的自动化端到端测试 (`main_test.go`)**：
+   - 包含 7 大系统测试用例，覆盖中间件注入、Panic 恢复、特性页、分页检索、详情渲染、文件上传及后台完整 CRUD，`go test -v .` 秒级全绿（~0.3s）。
 
 ---
 
@@ -103,34 +110,39 @@ go run main.go
 
 ```text
 godeniter-starter/
-├── main.go                 # 应用启动入口 (路由注册、依赖注入装配)
-├── main_test.go            # 自动化端到端测试 (首页分页、搜索、详情页、后台 CRUD)
+├── main.go                 # 应用启动入口 (中间件挂载、路由组注册、依赖注入装配)
+├── main_test.go            # 自动化端到端测试 (中间件头、Panic恢复、文件上传、分页、CRUD)
 ├── config.json             # 外部动态配置文件 (端口、数据库、上传配置)
 ├── config/                 # 配置装配层
 │   └── app.go
 ├── data/                   # 本地数据库存储目录 (自动创建)
 ├── app/
 │   ├── controllers/        # 控制器层 (API 控制器与 Web 页面控制器)
-│   │   ├── home.go         # 前台首页与文章详情页控制器 (搜索、分页、详情)
-│   │   ├── admin.go        # 后台管理控制器 (文章列表、新建、编辑、删除 CRUD)
+│   │   ├── home.go         # 前台首页、文章详情页、特性体验中心与 Panic 测试
+│   │   ├── admin.go        # 后台管理控制器 (带封面上传的列表、新建、编辑、删除 CRUD)
 │   │   ├── auth.go         # Session 登录与注销控制器
 │   │   └── api_article.go  # RESTful API 控制器 (含文件上传、分页检索与参数校验)
-│   ├── models/             # 数据实体与请求校验 DTO
+│   ├── models/             # 数据实体与请求校验 DTO (含 binding 规则)
 │   │   └── article.go
 │   ├── services/           # 业务逻辑层 (Service)
-│   │   └── article.go      # 预设 8 篇文章，提供分页、搜索、自增阅读量与 CRUD
-│   └── middleware/         # 自定义中间件 (如 AuthRequired 登录拦截)
-│       └── auth.go
+│   │   └── article.go      # 预设 8 篇文章，提供分页、搜索、自增阅读量、XSS过滤与 CRUD
+│   └── middleware/         # 自定义业务中间件
+│       ├── auth.go         # AuthRequired 登录认证拦截 (路由守卫)
+│       ├── timer.go        # ResponseTimer 响应计时与性能监控
+│       └── security.go     # SecurityHeaders 安全防护响应头
 ├── views/                  # 内嵌浅色调 HTML 模板 (单文件打包)
-│   ├── index.html          # 浅色调前台首页 (含搜索框、文章卡片、分页导航)
-│   ├── detail.html         # 浅色调文章详情页 (含面包屑、正文排版与阅读量)
+│   ├── index.html          # 浅色调前台首页 (含搜索框、封面卡片、分页导航)
+│   ├── detail.html         # 浅色调文章详情页 (含高清封面图、面包屑与阅读量)
+│   ├── features.html       # 浅色调框架特性全景体验中心 (可视化探针与交互测试)
 │   ├── login.html          # 浅色调登录面板 (管理员登录)
-│   ├── admin.html          # 浅色调后台管理中心 (文章列表、操作入口)
-│   └── article_form.html   # 浅色调文章发布与编辑通用表单
+│   ├── admin.html          # 浅色调后台管理中心 (含封面缩略图列表、操作入口)
+│   └── article_form.html   # 浅色调文章发布与编辑表单 (含封面图片选择与本地预览)
 ├── uploads/                # 运行时文件上传存储目录
+│   └── images/             # 上传图片存储目录 (内置 sample_cover.svg)
 ├── build.sh / build.bat    # 跨平台一键打包单文件脚本
 └── go.mod                  # 模块声明 (引入 godeniter)
 ```
+
 
 ---
 

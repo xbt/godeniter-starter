@@ -90,3 +90,23 @@ func (ctrl *HomeController) Detail(c *godeniter.Context, svc *services.ArticleSe
 		"Article":     article,
 	})
 }
+
+// Features 渲染框架特性体验中心页面 (/features)
+func (ctrl *HomeController) Features(c *godeniter.Context, sess session.Session) {
+	var username string
+	if sess != nil {
+		username = sess.GetString("username")
+	}
+
+	c.HTML(http.StatusOK, "features.html", godeniter.H{
+		"Title":       "Godeniter 2.0 框架特性全景体验中心",
+		"CurrentUser": username,
+		"ActiveNav":   "features",
+	})
+}
+
+// PanicDemo 演示 Recovery 中间件捕获 Panic 不崩服 (/demo/panic)
+func (ctrl *HomeController) PanicDemo(c *godeniter.Context) {
+	panic("【模拟业务故障】这是一次由 /demo/panic 故意触发的 Runtime Panic！请观察控制台彩色错误堆栈输出与服务端返回的 500 状态码。服务未宕机，依然平稳运行！")
+}
+

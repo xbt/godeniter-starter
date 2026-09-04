@@ -12,7 +12,7 @@
         header { background: #ffffff; border-bottom: 1px solid #e2e8f0; position: sticky; top: 0; z-index: 10; }
         .nav-container { max-width: 960px; margin: 0 auto; padding: 14px 20px; display: flex; justify-content: space-between; align-items: center; }
         .logo { font-size: 18px; font-weight: 700; color: #0284c7; text-decoration: none; display: flex; align-items: center; gap: 8px; }
-        .nav-actions { display: flex; align-items: center; gap: 12px; font-size: 14px; }
+        .nav-actions { display: flex; align-items: center; gap: 14px; font-size: 14px; }
         .user-tag { background: #f1f5f9; color: #475569; padding: 4px 10px; border-radius: 20px; font-size: 13px; }
         .btn-link { color: #0284c7; text-decoration: none; font-weight: 500; }
         .btn-link:hover { text-decoration: underline; }
@@ -41,12 +41,16 @@
         /* 文章卡片列表 */
         .article-card { background: #ffffff; border: 1px solid #e2e8f0; border-radius: 8px; padding: 20px; margin-bottom: 16px; transition: transform 0.15s, border-color 0.15s, box-shadow 0.15s; box-shadow: 0 1px 3px rgba(0,0,0,0.03); }
         .article-card:hover { border-color: #93c5fd; box-shadow: 0 4px 10px rgba(0,0,0,0.05); transform: translateY(-1px); }
+        .article-body { display: flex; gap: 20px; align-items: flex-start; }
+        .article-cover { width: 160px; height: 105px; border-radius: 6px; object-fit: cover; border: 1px solid #e2e8f0; flex-shrink: 0; background: #f1f5f9; }
+        .article-main { flex: 1; min-width: 0; }
         .article-title { font-size: 17px; font-weight: 600; margin-bottom: 8px; }
         .article-title a { color: #0f172a; text-decoration: none; transition: color 0.15s; }
         .article-title a:hover { color: #0284c7; }
         .article-meta { display: flex; align-items: center; gap: 12px; font-size: 12px; color: #64748b; margin-bottom: 10px; }
         .badge-view { background: #eff6ff; color: #2563eb; padding: 2px 8px; border-radius: 12px; font-weight: 500; }
         .badge-author { background: #f8fafc; color: #475569; border: 1px solid #e2e8f0; padding: 2px 8px; border-radius: 12px; }
+        .badge-cover { background: #ecfdf5; color: #059669; border: 1px solid #a7f3d0; padding: 2px 8px; border-radius: 12px; font-size: 11px; }
         .article-desc { font-size: 14px; color: #475569; line-height: 1.6; margin-bottom: 12px; }
         .read-more { font-size: 13px; color: #0284c7; text-decoration: none; font-weight: 500; display: inline-flex; align-items: center; }
         .read-more:hover { text-decoration: underline; }
@@ -67,12 +71,12 @@
         <div class="nav-container">
             <a href="/" class="logo">🚀 Godeniter Starter</a>
             <div class="nav-actions">
+                <a href="/features" class="btn-link" style="color: #0284c7; font-weight: 600;">⚡ 框架特性体验</a>
                 {{ if .CurrentUser }}
-                    <span class="user-tag">👤 管理员: {{ .CurrentUser }}</span>
-                    <a href="/admin/articles" class="btn-primary">后台管理</a>
+                    <span class="user-tag">👤 {{ .CurrentUser }}</span>
+                    <a href="/admin/articles" class="btn-primary">后台管理中心</a>
                     <a href="/logout" class="btn-link">退出</a>
                 {{ else }}
-                    <span class="user-tag">访客模式</span>
                     <a href="/login" class="btn-primary">管理员登录</a>
                 {{ end }}
             </div>
@@ -89,9 +93,9 @@
         <div class="hero">
             <h2>💡 基于 Godeniter 2.0 纯标准库驱动的高性能脚手架</h2>
             <p>
-                当前演示文章已内置 8 篇，每页展示 5 条，支持<strong>动态模糊检索</strong>、<strong>分页下钻</strong>与<strong>点击标题查看详情（自动自增阅读量）</strong>。
+                当前演示文章已内置 8 篇，每页展示 5 条，全面涵盖<strong>封面上传/静态服务</strong>、<strong>请求计时中间件</strong>、<strong>XSS安全清洗</strong>、<strong>敏感信息脱敏</strong>与<strong>文章增删改查</strong>。
                 <br>
-                系统唯一会话 UUID: <code>{{ .RandomUUID }}</code>
+                系统唯一会话 UUID: <code>{{ .RandomUUID }}</code> &bull; <a href="/features" style="color: #0284c7; text-decoration: underline;">点击进入框架全景特性体验专区 &rarr;</a>
             </p>
         </div>
 
@@ -116,16 +120,28 @@
             {{ if .Articles }}
                 {{ range .Articles }}
                 <div class="article-card">
-                    <div class="article-title">
-                        <a href="/article/{{ .ID }}">#{{ .ID }} {{ .Title }}</a>
+                    <div class="article-body">
+                        {{ if .CoverURL }}
+                        <a href="/article/{{ .ID }}">
+                            <img src="{{ .CoverURL }}" alt="封面" class="article-cover">
+                        </a>
+                        {{ end }}
+                        <div class="article-main">
+                            <div class="article-title">
+                                <a href="/article/{{ .ID }}">#{{ .ID }} {{ .Title }}</a>
+                            </div>
+                            <div class="article-meta">
+                                <span class="badge-author">✍️ {{ .AuthorMask }}</span>
+                                <span class="badge-view">👀 {{ .Views }} 次浏览</span>
+                                {{ if .CoverURL }}
+                                <span class="badge-cover">🖼️ 有封面</span>
+                                {{ end }}
+                                <span>📅 {{ .CreatedAt.Format "2006-01-02 15:04" }}</span>
+                            </div>
+                            <div class="article-desc">{{ .Content }}</div>
+                            <a href="/article/{{ .ID }}" class="read-more">阅读详情 &rarr;</a>
+                        </div>
                     </div>
-                    <div class="article-meta">
-                        <span class="badge-author">✍️ {{ .AuthorMask }}</span>
-                        <span class="badge-view">👀 {{ .Views }} 次浏览</span>
-                        <span>📅 {{ .CreatedAt.Format "2006-01-02 15:04" }}</span>
-                    </div>
-                    <div class="article-desc">{{ .Content }}</div>
-                    <a href="/article/{{ .ID }}" class="read-more">阅读详情 &rarr;</a>
                 </div>
                 {{ end }}
             {{ else }}

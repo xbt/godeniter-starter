@@ -14,9 +14,9 @@ type Article struct {
 	CreatedAt  time.Time `json:"created_at" db:"created_at"`
 }
 
-// CreateArticleRequest 创建文章请求 DTO
+// CreateArticleRequest 创建文章请求 DTO (用于 RESTful API，支持 JSON 绑定与校验)
 type CreateArticleRequest struct {
-	Title    string `json:"title" binding:"required,min=2,max=50"`
+	Title    string `json:"title" binding:"required,min=2,max=60"`
 	Content  string `json:"content" binding:"required,min=5"`
 	Author   string `json:"author" binding:"required"`
 	CoverURL string `json:"cover_url"`
@@ -27,4 +27,11 @@ type ArticleQueryRequest struct {
 	Keyword  string `form:"keyword"`
 	Page     int    `form:"page"`
 	PageSize int    `form:"page_size"`
+}
+
+// FormArticleRequest Web 表单提交 DTO (用于服务端渲染表单，支持结构体 Tag 自动校验)
+type FormArticleRequest struct {
+	Title   string `form:"title" binding:"required,min=3,max=80"`
+	Author  string `form:"author" binding:"required,min=2,max=30"`
+	Content string `form:"content" binding:"required,min=10"`
 }
