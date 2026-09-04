@@ -18,6 +18,21 @@ go run main.go
 
 ---
 
+## 📴 离线与受限网络开发说明 (Air-gapped & Offline Ready)
+
+本 Starter 工程与 `godeniter` 核心框架均采用 **100% 纯 Go 标准库（0 外部第三方依赖）** 设计：
+
+* **源码包解压即用**：将 `godeniter` 和 `godeniter-starter` 解压到同级目录：
+  ```text
+  my_workspace/
+  ├── godeniter/           <-- 框架源码
+  └── godeniter-starter/   <-- 脚手架工程
+  ```
+* **本地依赖自动生效**：`go.mod` 中已内置 `replace github.com/xbt/godeniter => ../godeniter`，编译直接读取本地源码，**全程 0 网络请求**。
+* **终极离线交付**：直接运行 `./build.sh` 生成 `dist/app.exe` 交付给客户，客户机无需安装 Go 环境，双击即可运行。
+
+---
+
 ## 📁 规范的项目目录结构
 
 ```text
