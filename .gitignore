@@ -1,0 +1,16 @@
+# 编译产物
+/dist/
+*.exe
+*.dll
+*.so
+*.dylib
+
+# 运行时上传文件
+/uploads/*
+!/uploads/.gitkeep
+
+# IDE 配置
+.idea/
+.vscode/
+*.swp
+*.DS_Store
