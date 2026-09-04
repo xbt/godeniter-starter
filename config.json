@@ -1,0 +1,25 @@
+{
+  "app": {
+    "name": "Godeniter Starter Application",
+    "port": ":8080",
+    "env": "development",
+    "session_key": "godeniter-starter-secret-salt-2026"
+  },
+  "database": {
+    "driver": "sqlite",
+    "dsn": "./data/app.db",
+    "max_open_conns": 1,
+    "max_idle_conns": 1,
+    "conn_max_lifetime": 300
+  },
+  "upload": {
+    "dir": "./uploads",
+    "max_size_mb": 5,
+    "allowed_exts": [
+      ".jpg",
+      ".png",
+      ".jpeg",
+      ".webp"
+    ]
+  }
+}

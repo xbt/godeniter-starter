@@ -33,13 +33,47 @@ go run main.go
 
 ---
 
+## ⚙️ 动态配置管理 (`config.json`)
+
+项目基于 **纯 Go 标准库（0 外部依赖）** 实现三层动态配置装配：
+
+* **开箱即用**：首次运行若未检测到配置文件，程序将**自动在当前目录生成一份格式化的 `config.json`**。
+* **修改端口与数据库**：直接使用任意文本编辑器（如记事本）打开 `config.json` 即可调整：
+  ```json
+  {
+    "app": {
+      "name": "Godeniter Starter Application",
+      "port": ":8080",
+      "env": "development",
+      "session_key": "godeniter-starter-secret-salt-2026"
+    },
+    "database": {
+      "driver": "sqlite",
+      "dsn": "./data/app.db",
+      "max_open_conns": 1,
+      "max_idle_conns": 1,
+      "conn_max_lifetime": 300
+    },
+    "upload": {
+      "dir": "./uploads",
+      "max_size_mb": 5,
+      "allowed_exts": [".jpg", ".png", ".jpeg", ".webp"]
+    }
+  }
+  ```
+* **云原生 / 容器化覆盖**：支持通过系统环境变量（如 `PORT=:9000`、`DATABASE_DSN="..."`）动态覆盖对应字段。
+
+---
+
 ## 📁 规范的项目目录结构
 
 ```text
 godeniter-starter/
 ├── main.go                 # 应用启动入口 (路由注册、依赖注入装配)
-├── config/                 # 应用配置层
+├── config.json             # 外部动态配置文件 (端口、数据库、上传配置)
+├── config/                 # 配置装配层
 │   └── app.go
+├── data/                   # 本地数据库存储目录 (自动创建)
 ├── app/
 │   ├── controllers/        # 控制器层 (API 控制器与 Web 页面控制器)
 │   │   ├── home.go         # 首页/仪表盘控制器
