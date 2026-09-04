@@ -3,9 +3,9 @@ package main
 import (
 	"embed"
 	"fmt"
-	"html/template"
 	"io/fs"
 	"os"
+
 
 	"github.com/xbt/godeniter"
 	"github.com/xbt/godeniter/daemon"
@@ -40,11 +40,12 @@ func setupApp(cfg *config.Config) *godeniter.Engine {
 	// 静态文件目录映射 (支持本地物理文件与上传文件分发)
 	app.Static("/uploads", cfg.Upload.Dir)
 
-	// 加载内嵌 HTML 服务端模板 (支持单文件二进制一键打包)
+	// 加载内嵌 HTML 服务端模板 (原生内置 <!--{{ ... }}--> 无侵入注释模板支持与单文件打包)
 	subViews, err := fs.Sub(viewsFS, "views")
 	if err == nil {
-		app.SetHTMLTemplate(template.Must(template.ParseFS(subViews, "*.html")))
+		app.LoadHTMLFS(subViews, "*.html")
 	}
+
 
 	// 注册业务服务与控制器依赖注入 (DI 容器)
 	articleSvc := services.NewArticleService()

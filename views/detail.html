@@ -82,10 +82,12 @@
 
                 <div class="footer-action">
                     <a href="/" class="back-btn">&larr; 返回文章列表</a>
-                    {{ if .CurrentUser }}
-                        <a href="/admin/articles/edit/{{ .Article.ID }}" class="edit-btn">✏️ 编辑此文章</a>
-                    {{ end }}
+                    <!-- 兼顾纯前端静态原型预览与服务端渲染的无侵入注释语法 -->
+                    <!--{{ if .CurrentUser }}-->
+                        <a href="/admin/articles/edit/<!--{{ .Article.ID }}-->" class="edit-btn">✏️ 编辑此文章</a>
+                    <!--{{ end }}-->
                 </div>
+
             </div>
         {{ end }}
     </main>

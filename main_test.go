@@ -152,7 +152,23 @@ func TestArticleDetail(t *testing.T) {
 		t.Errorf("详情页应包含标题")
 	}
 
-	// 2. 访问不存在的详情页
+	// 2. 测试已登录状态下，无侵入注释语法 <!--{{ if .CurrentUser }}--> 正确渲染编辑按钮
+	wLogin := httptest.NewRecorder()
+	loginData := url.Values{"username": {"admin"}, "password": {"123456"}}
+	reqLogin, _ := http.NewRequest("POST", "/login", strings.NewReader(loginData.Encode()))
+	reqLogin.Header.Set("Content-Type", "application/x-www-form-urlencoded")
+	app.ServeHTTP(wLogin, reqLogin)
+	cookie := wLogin.Header().Get("Set-Cookie")
+
+	wAuth := httptest.NewRecorder()
+	reqAuth, _ := http.NewRequest("GET", "/article/1", nil)
+	reqAuth.Header.Set("Cookie", cookie)
+	app.ServeHTTP(wAuth, reqAuth)
+	if !strings.Contains(wAuth.Body.String(), `/admin/articles/edit/1`) {
+		t.Errorf("注释语法 <!--{{ .Article.ID }}--> 预期在登录后渲染编辑按钮，实际未找到")
+	}
+
+	// 3. 访问不存在的详情页
 	w2 := httptest.NewRecorder()
 	req2, _ := http.NewRequest("GET", "/article/9999", nil)
 	app.ServeHTTP(w2, req2)
@@ -160,6 +176,7 @@ func TestArticleDetail(t *testing.T) {
 		t.Fatalf("不存在的文章应返回 404，实际: %d", w2.Code)
 	}
 }
+
 
 // TestFileUploadAPI 测试 RESTful 文件上传接口与安全限制
 func TestFileUploadAPI(t *testing.T) {
