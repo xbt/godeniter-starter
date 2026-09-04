@@ -42,6 +42,27 @@ func TestMiddlewarePipelineAndHeaders(t *testing.T) {
 	}
 }
 
+// TestFavicon 测试单文件内嵌并正确分发自定义 /favicon.ico 图标
+func TestFavicon(t *testing.T) {
+	cfg := config.DefaultConfig()
+	app := setupApp(cfg)
+
+	w := httptest.NewRecorder()
+	req, _ := http.NewRequest("GET", "/favicon.ico", nil)
+	app.ServeHTTP(w, req)
+
+	if w.Code != http.StatusOK {
+		t.Fatalf("请求 /favicon.ico 应返回 200，实际: %d", w.Code)
+	}
+	if w.Header().Get("Content-Type") != "image/x-icon" {
+		t.Errorf("Content-Type 预期为 image/x-icon，实际: %s", w.Header().Get("Content-Type"))
+	}
+	if w.Body.Len() == 0 {
+		t.Errorf("favicon.ico 数据长度不应为空")
+	}
+}
+
+
 // TestPanicRecovery 测试中间件优雅捕获 Panic 并维持进程不崩服
 func TestPanicRecovery(t *testing.T) {
 	cfg := config.DefaultConfig()

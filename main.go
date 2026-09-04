@@ -4,6 +4,7 @@ import (
 	"embed"
 	"fmt"
 	"io/fs"
+	"net/http"
 	"os"
 
 
@@ -20,6 +21,9 @@ import (
 
 //go:embed views/*
 var viewsFS embed.FS
+
+//go:embed app.ico
+var appIcoBytes []byte
 
 // setupApp 初始化 Godeniter 引擎并挂载所有中间件、模板和路由 (便于测试与复用)
 func setupApp(cfg *config.Config) *godeniter.Engine {
@@ -45,6 +49,11 @@ func setupApp(cfg *config.Config) *godeniter.Engine {
 	if err == nil {
 		app.LoadHTMLFS(subViews, "*.html")
 	}
+
+	// 浏览器 Favicon 图标路由 (内嵌单文件打包，返回 0 依赖自定义 ICO)
+	app.Get("/favicon.ico", func(c *godeniter.Context) {
+		c.Data(http.StatusOK, "image/x-icon", appIcoBytes)
+	})
 
 
 	// 注册业务服务与控制器依赖注入 (DI 容器)
