@@ -33,6 +33,12 @@
             </div>
         </header>
 
+        {{ if .FlashNotice }}
+        <div style="background: #064e3b; border-left: 4px solid #10b981; color: #a7f3d0; padding: 12px 16px; border-radius: 6px; margin-bottom: 20px; font-size: 13px;">
+            {{ .FlashNotice }}
+        </div>
+        {{ end }}
+
         <div class="hero">
             💡 本项目由 <strong>godeniter-starter</strong> 模板脚手架生成，基于 Godeniter 2.0 驱动。0 外部依赖，支持单文件极速打包分发！
             <br>

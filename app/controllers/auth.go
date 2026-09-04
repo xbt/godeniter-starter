@@ -25,6 +25,7 @@ func (ctrl *AuthController) LoginSubmit(c *godeniter.Context, sess session.Sessi
 	if username == "admin" && password == "123456" {
 		if sess != nil {
 			sess.Set("username", username)
+			sess.SetFlash("notice", "🎉 登录成功，欢迎回来管理员！")
 		}
 		c.Redirect(http.StatusFound, "/")
 		return
@@ -41,6 +42,7 @@ func (ctrl *AuthController) LoginSubmit(c *godeniter.Context, sess session.Sessi
 func (ctrl *AuthController) Logout(c *godeniter.Context, sess session.Session) {
 	if sess != nil {
 		sess.Delete("username")
+		sess.SetFlash("notice", "您已安全注销退出。")
 	}
 	c.Redirect(http.StatusFound, "/")
 }

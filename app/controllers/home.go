@@ -14,8 +14,10 @@ type HomeController struct{}
 // Index 渲染首页
 func (ctrl *HomeController) Index(c *godeniter.Context, svc *services.ArticleService, sess session.Session) {
 	var username string
+	var flashNotice string
 	if sess != nil {
 		username = sess.GetString("username")
+		flashNotice = sess.GetFlashString("notice")
 	}
 
 	items, total := svc.ListPaginate("", 1, 10)
@@ -23,6 +25,7 @@ func (ctrl *HomeController) Index(c *godeniter.Context, svc *services.ArticleSer
 	c.HTML(http.StatusOK, "index.html", godeniter.H{
 		"Title":       "Godeniter Starter Dashboard",
 		"CurrentUser": username,
+		"FlashNotice": flashNotice,
 		"TotalCount":  total,
 		"Articles":    items,
 		"RandomUUID":  str.UUID(),
