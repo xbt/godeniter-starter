@@ -194,3 +194,10 @@ go test -v .
 * **Windows .exe 桌面图标动态缝合**：执行 `./build.sh` 或 `build.bat` 时，脚本自动动态检测 `app.ico`，通过框架内置纯标准库将其自动转译为 `resource_windows_amd64.syso` 并缝合进 `dist/app.exe`。在 Windows 桌面和资源管理器中呈现专属应用图标，**全程 0 外部依赖、0 外部工具链、断网无网直接可用**！
 * **浏览器 Favicon 自动内嵌**：程序内嵌该图标并注册 `/favicon.ico` 路由，浏览器访问时标签页左上角自动展示该图标。
 
+---
+
+## 📄 开源许可证 (License)
+
+Godeniter Starter 脚手架工程基于宽松友好的 **[MIT License](./LICENSE)** 协议开源，允许任何个人与企业自由用于商业业务系统或闭源软件的研发与分发。
+
+
