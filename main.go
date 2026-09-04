@@ -1,12 +1,14 @@
 package main
 
 import (
+	"context"
 	"embed"
 	"fmt"
 	"io/fs"
 	"net/http"
 	"os"
 	"strings"
+	"time"
 
 	"github.com/xbt/godeniter"
 	"github.com/xbt/godeniter/daemon"
@@ -122,18 +124,22 @@ func main() {
 		webURL := "http://127.0.0.1" + cfg.App.Port
 		fmt.Printf(">> [TRAY] 正在以桌面系统托盘模式启动 [%s]...\n", cfg.App.Name)
 		fmt.Printf(">> [TRAY] 本地后台访问网址: %s\n", webURL)
-		fmt.Println(">> [TRAY] 提示: 点击或右键系统托盘/状态栏图标可进行管理")
+		fmt.Println(">> [TRAY] 提示: 顶部菜单栏/系统托盘已常驻图标与管理菜单，随时按 Ctrl+C 或点击菜单项安全退出")
 
 		// 异步协程启动 Web 服务
+		srv := &http.Server{
+			Addr:    cfg.App.Port,
+			Handler: app,
+		}
 		go func() {
-			if err := app.Run(cfg.App.Port); err != nil && err != http.ErrServerClosed {
+			if err := srv.ListenAndServe(); err != nil && err != http.ErrServerClosed {
 				fmt.Printf(">> [ERROR] Web 服务运行异常: %v\n", err)
 			}
 		}()
 
 		// 主线程运行跨平台桌面托盘与状态栏菜单 (阻塞至用户退出)
 		_ = tray.Run(tray.Options{
-			Title:     cfg.App.Name,
+			Title:     "Godeniter",
 			Tooltip:   fmt.Sprintf("%s (%s)", cfg.App.Name, cfg.App.Port),
 			IconBytes: appIcoBytes,
 			URL:       webURL,
@@ -141,7 +147,11 @@ func main() {
 			Version:   "v1.0.0",
 			Port:      cfg.App.Port,
 			OnExit: func() {
-				fmt.Println(">> [TRAY] 托盘已退出，正在安全关闭服务...")
+				fmt.Println("\n>> [TRAY] 收到退出指令，正在安全平滑关闭 Web 服务...")
+				ctx, cancel := context.WithTimeout(context.Background(), 3*time.Second)
+				defer cancel()
+				_ = srv.Shutdown(ctx)
+				fmt.Println(">> [TRAY] 服务已成功安全停止。")
 			},
 		})
 		return
