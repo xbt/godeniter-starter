@@ -4,6 +4,7 @@ import (
 	"context"
 	"embed"
 	"fmt"
+	"html/template"
 	"io/fs"
 	"net/http"
 	"os"
@@ -45,6 +46,16 @@ func setupApp(cfg *config.Config) *godeniter.Engine {
 
 	// 静态文件目录映射 (支持本地物理文件与上传文件分发)
 	app.Static("/uploads", cfg.Upload.Dir)
+
+	// 注册全局视图模板辅助函数 (通过 app.SetFuncMap 链式调用)
+	app.SetFuncMap(template.FuncMap{
+		"formatDate": func(t time.Time, layout string) string {
+			if layout == "" {
+				layout = "2006-01-02 15:04"
+			}
+			return t.Format(layout)
+		},
+	})
 
 	// 加载内嵌 HTML 服务端模板 (原生内置 <!--{{ ... }}--> 无侵入注释模板支持与单文件打包)
 	subViews, err := fs.Sub(viewsFS, "views")
