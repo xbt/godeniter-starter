@@ -6,17 +6,17 @@ import (
 	"io/fs"
 	"net/http"
 	"os"
-
+	"strings"
 
 	"github.com/xbt/godeniter"
 	"github.com/xbt/godeniter/daemon"
 	"github.com/xbt/godeniter/middleware"
 	"github.com/xbt/godeniter/session"
+	"github.com/xbt/godeniter/tray"
 	"godeniter-starter/app/controllers"
 	appMiddleware "godeniter-starter/app/middleware"
 	"godeniter-starter/app/services"
 	"godeniter-starter/config"
-
 )
 
 //go:embed views/*
@@ -112,7 +112,42 @@ func main() {
 	// 2. 初始化应用引擎
 	app := setupApp(cfg)
 
-	// 3. 由守护进程管理器统一接管服务启动与生命周期指令 (支持 start/stop/restart/status 与后台静默运行)
+	// 3. 判断是否启用桌面系统托盘模式 (支持命令行参数 `tray` 或配置文件 `"tray": true`)
+	isTrayMode := cfg.App.Tray
+	if len(os.Args) > 1 && strings.ToLower(os.Args[1]) == "tray" {
+		isTrayMode = true
+	}
+
+	if isTrayMode {
+		webURL := "http://127.0.0.1" + cfg.App.Port
+		fmt.Printf(">> [TRAY] 正在以桌面系统托盘模式启动 [%s]...\n", cfg.App.Name)
+		fmt.Printf(">> [TRAY] 本地后台访问网址: %s\n", webURL)
+		fmt.Println(">> [TRAY] 提示: 点击或右键系统托盘/状态栏图标可进行管理")
+
+		// 异步协程启动 Web 服务
+		go func() {
+			if err := app.Run(cfg.App.Port); err != nil && err != http.ErrServerClosed {
+				fmt.Printf(">> [ERROR] Web 服务运行异常: %v\n", err)
+			}
+		}()
+
+		// 主线程运行跨平台桌面托盘与状态栏菜单 (阻塞至用户退出)
+		_ = tray.Run(tray.Options{
+			Title:     cfg.App.Name,
+			Tooltip:   fmt.Sprintf("%s (%s)", cfg.App.Name, cfg.App.Port),
+			IconBytes: appIcoBytes,
+			URL:       webURL,
+			AppDir:    tray.GetExecutableDir(),
+			Version:   "v1.0.0",
+			Port:      cfg.App.Port,
+			OnExit: func() {
+				fmt.Println(">> [TRAY] 托盘已退出，正在安全关闭服务...")
+			},
+		})
+		return
+	}
+
+	// 4. 由守护进程管理器统一接管服务启动与生命周期指令 (支持 start/stop/restart/status 与后台静默运行)
 	_ = daemon.Run(app, cfg.App.Port, daemon.Config{
 		Daemon:  cfg.App.Daemon,
 		PIDFile: cfg.App.PIDFile,

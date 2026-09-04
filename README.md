@@ -35,6 +35,23 @@ go run main.go stop       # 或 ./dist/app stop
 go run main.go restart    # 或 ./dist/app restart
 ```
 
+### 3. 跨平台桌面系统托盘 / 状态栏客户端模式 (macOS / Windows 常驻)
+若您希望将本 Web 服务作为独立的本地客户端或桌面托盘分发给用户使用：
+```bash
+# 源码方式启动系统托盘模式
+go run main.go tray
+
+# 或直接运行打包后的二进制
+./dist/app tray
+```
+* **macOS 体验**：在屏幕右上角菜单栏常驻应用图标 🚀，点击展开菜单：
+  * 🌐 **打开管理后台**：调起默认浏览器访问 Web 页面；
+  * 📁 **打开应用目录**：直接调起 Finder 定位应用目录，方便查找 `config.json` 与数据文件；
+  * ℹ️ **关于系统**：原生弹窗展示版本、运行端口与系统信息；
+  * ⏹️ **退出程序**：平滑关闭 Web 服务并安全退出。
+* **Windows 体验**：在屏幕右下角通知区域常驻托盘图标，右键弹出菜单，双击图标直接在浏览器打开后台。
+* **常驻配置文件支持**：直接在 `config.json` 中配置 `"tray": true`，无需任何命令行参数，双击运行即自动以托盘模式常驻！
+
 ---
 
 ## 📴 离线与受限网络开发说明 (Air-gapped & Offline Ready)
@@ -178,11 +195,14 @@ godeniter-starter/
 # 运行单元测试
 go test -v .
 
-# 生成 Windows 64位单文件可执行程序 (dist/app.exe) 及本地二进制
+# 生成 Windows 64位单文件可执行程序 (dist/app.exe / dist/app_tray.exe) 及本地二进制
 ./build.sh
 ```
 
-生成的 `dist/app.exe` 无需安装任何环境，直接拷贝给客户，**双击即可直接运行**！
+生成的单文件无需安装任何环境，直接拷贝给客户，**双击即可直接运行**：
+* `dist/app.exe`：带控制台窗口（适合服务器守护进程运维或开发者前台查看日志）；
+* `dist/app_tray.exe`：**纯静默桌面托盘客户端（彻底隐藏控制台黑框）**，双击后直接常驻在 Windows 屏幕右下角托盘！
+* `dist/app`：macOS / Linux 平台统一可执行文件。
 
 ---
 

@@ -5,6 +5,7 @@
     "env": "development",
     "session_key": "godeniter-starter-secret-salt-2026",
     "daemon": false,
+    "tray": false,
     "pid_file": "./app.pid",
     "log_file": "./app.log"
   },
