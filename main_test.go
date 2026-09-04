@@ -264,18 +264,23 @@ func TestAdminAuthAndCRUD(t *testing.T) {
 		t.Errorf("预期触发表单校验失败提示，实际未拦截")
 	}
 
-	// 5. 创建有效新文章 (POST /admin/articles/create)
-	createForm := url.Values{}
-	createForm.Set("title", "测试自动创建文章")
-	createForm.Set("author", "测试作者")
-	createForm.Set("content", "这是自动化单测中发布的内容，字数符合要求。")
+	// 5. 创建有效新文章 (POST /admin/articles/create，采用页面真实使用的 multipart/form-data 并附带封面上传)
+	createBody := &bytes.Buffer{}
+	createWriter := multipart.NewWriter(createBody)
+	_ = createWriter.WriteField("title", "测试自动创建文章")
+	_ = createWriter.WriteField("author", "测试作者")
+	_ = createWriter.WriteField("content", "这是自动化单测中发布的内容，字数符合要求。")
+	partCreate, _ := createWriter.CreateFormFile("cover", "init_cover.png")
+	_, _ = partCreate.Write([]byte("fake png binary data for initial cover"))
+	_ = createWriter.Close()
+
 	wCreate := httptest.NewRecorder()
-	reqCreate, _ := http.NewRequest("POST", "/admin/articles/create", strings.NewReader(createForm.Encode()))
-	reqCreate.Header.Set("Content-Type", "application/x-www-form-urlencoded")
+	reqCreate, _ := http.NewRequest("POST", "/admin/articles/create", createBody)
+	reqCreate.Header.Set("Content-Type", createWriter.FormDataContentType())
 	reqCreate.Header.Set("Cookie", cookie)
 	app.ServeHTTP(wCreate, reqCreate)
 	if wCreate.Code != http.StatusFound {
-		t.Fatalf("创建文章预期重定向到列表，实际: %d", wCreate.Code)
+		t.Fatalf("创建文章预期重定向到列表，实际: %d, body: %s", wCreate.Code, wCreate.Body.String())
 	}
 
 	// 6. 验证新创建的文章在详情页可以访问 (预置 8 篇，新文章 ID 应为 9)
@@ -289,26 +294,34 @@ func TestAdminAuthAndCRUD(t *testing.T) {
 		t.Errorf("详情页未找到新创建的文章标题")
 	}
 
-	// 7. 编辑新文章 (POST /admin/articles/edit/9)
-	editForm := url.Values{}
-	editForm.Set("title", "已修改标题测试")
-	editForm.Set("author", "测试作者")
-	editForm.Set("content", "内容已被编辑更新，保持字数充足。")
+	// 7. 编辑新文章 (POST /admin/articles/edit/9，使用 multipart/form-data 模拟带图片上传)
+	editBody := &bytes.Buffer{}
+	mpWriter := multipart.NewWriter(editBody)
+	_ = mpWriter.WriteField("title", "已修改标题测试(带封面上传)")
+	_ = mpWriter.WriteField("author", "测试作者")
+	_ = mpWriter.WriteField("content", "内容已被编辑更新，并且成功上传了新封面！")
+	partCover, _ := mpWriter.CreateFormFile("cover", "new_cover.png")
+	_, _ = partCover.Write([]byte("fake png binary data for cover update"))
+	_ = mpWriter.Close()
+
 	wEdit := httptest.NewRecorder()
-	reqEdit, _ := http.NewRequest("POST", "/admin/articles/edit/9", strings.NewReader(editForm.Encode()))
-	reqEdit.Header.Set("Content-Type", "application/x-www-form-urlencoded")
+	reqEdit, _ := http.NewRequest("POST", "/admin/articles/edit/9", editBody)
+	reqEdit.Header.Set("Content-Type", mpWriter.FormDataContentType())
 	reqEdit.Header.Set("Cookie", cookie)
 	app.ServeHTTP(wEdit, reqEdit)
 	if wEdit.Code != http.StatusFound {
-		t.Fatalf("编辑文章预期重定向，实际: %d", wEdit.Code)
+		t.Fatalf("编辑文章预期 302 重定向，实际: %d, body: %s", wEdit.Code, wEdit.Body.String())
 	}
 
-	// 验证修改生效
+	// 验证修改生效且封面已被更新
 	wDetail2 := httptest.NewRecorder()
 	reqDetail2, _ := http.NewRequest("GET", "/article/9", nil)
 	app.ServeHTTP(wDetail2, reqDetail2)
-	if !strings.Contains(wDetail2.Body.String(), "已修改标题测试") {
+	if !strings.Contains(wDetail2.Body.String(), "已修改标题测试(带封面上传)") {
 		t.Errorf("文章详情页未呈现修改后的标题")
+	}
+	if !strings.Contains(wDetail2.Body.String(), "/uploads/images/") {
+		t.Errorf("文章详情页未呈现新上传的封面图片路径")
 	}
 
 	// 8. 删除新文章 (GET /admin/articles/delete/9)
