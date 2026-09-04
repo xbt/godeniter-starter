@@ -8,12 +8,14 @@ import (
 	"os"
 
 	"github.com/xbt/godeniter"
+	"github.com/xbt/godeniter/daemon"
 	"github.com/xbt/godeniter/middleware"
 	"github.com/xbt/godeniter/session"
 	"godeniter-starter/app/controllers"
 	appMiddleware "godeniter-starter/app/middleware"
 	"godeniter-starter/app/services"
 	"godeniter-starter/config"
+
 )
 
 //go:embed views/*
@@ -100,6 +102,11 @@ func main() {
 	// 2. 初始化应用引擎
 	app := setupApp(cfg)
 
-	// 3. 启动 HTTP 服务 (端口由 config.json 中的 app.port 动态决定，并支持 Ctrl+C 平滑退出)
-	_ = app.Run(cfg.App.Port)
+	// 3. 由守护进程管理器统一接管服务启动与生命周期指令 (支持 start/stop/restart/status 与后台静默运行)
+	_ = daemon.Run(app, cfg.App.Port, daemon.Config{
+		Daemon:  cfg.App.Daemon,
+		PIDFile: cfg.App.PIDFile,
+		LogFile: cfg.App.LogFile,
+	})
+
 }

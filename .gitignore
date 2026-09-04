@@ -5,9 +5,12 @@
 *.so
 *.dylib
 
-# 运行时上传文件
+# 运行时上传文件与日志 PID
 /uploads/*
 !/uploads/.gitkeep
+*.log
+*.pid
+
 
 # IDE 配置
 .idea/

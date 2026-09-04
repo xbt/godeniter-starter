@@ -20,6 +20,9 @@ type AppConfig struct {
 	Port       string `json:"port"`        // 服务监听端口 (例如 ":8080")
 	Env        string `json:"env"`         // 运行环境: development / production
 	SessionKey string `json:"session_key"` // Session 加密签名密钥
+	Daemon     bool   `json:"daemon"`      // 是否启用守护进程模式 (默认: false 前台运行，true 后台静默运行)
+	PIDFile    string `json:"pid_file"`    // 守护进程 PID 文件存储路径 (默认: "./app.pid")
+	LogFile    string `json:"log_file"`    // 守护进程运行日志存储路径 (默认: "./app.log")
 }
 
 // DatabaseConfig 数据库连接配置 (支持 sqlite / mysql 等标准 SQL 驱动)
@@ -46,7 +49,11 @@ func DefaultConfig() *Config {
 			Port:       ":8080",
 			Env:        "development",
 			SessionKey: "godeniter-starter-secret-salt-2026",
+			Daemon:     false,
+			PIDFile:    "./app.pid",
+			LogFile:    "./app.log",
 		},
+
 		Database: DatabaseConfig{
 			Driver:          "sqlite",
 			DSN:             "./data/app.db",
@@ -116,6 +123,16 @@ func LoadConfig(configPaths ...string) *Config {
 			cfg.Upload.MaxSizeMB = n
 		}
 	}
+	if d := os.Getenv("APP_DAEMON"); d == "true" || d == "1" {
+		cfg.App.Daemon = true
+	}
+	if pidFile := os.Getenv("PID_FILE"); pidFile != "" {
+		cfg.App.PIDFile = pidFile
+	}
+	if logFile := os.Getenv("LOG_FILE"); logFile != "" {
+		cfg.App.LogFile = logFile
+	}
+
 
 	return cfg
 }

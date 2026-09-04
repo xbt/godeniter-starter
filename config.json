@@ -3,8 +3,12 @@
     "name": "Godeniter Starter Application",
     "port": ":8080",
     "env": "development",
-    "session_key": "godeniter-starter-secret-salt-2026"
+    "session_key": "godeniter-starter-secret-salt-2026",
+    "daemon": false,
+    "pid_file": "./app.pid",
+    "log_file": "./app.log"
   },
+
   "database": {
     "driver": "sqlite",
     "dsn": "./data/app.db",

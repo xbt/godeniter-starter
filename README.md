@@ -6,15 +6,34 @@
 
 ## 🚀 快速上手 (Quick Start)
 
-### 1. 本地启动运行
+### 1. 本地前台开发模式 (随时 Ctrl+C 停止)
 ```bash
-# 启动 Web 服务
+# 启动 Web 服务 (默认前台运行，终端实时滚动日志与彩色 Banner)
 go run main.go
 ```
 启动后终端将自动打印本机与局域网访问地址，在浏览器中打开：`http://127.0.0.1:8080`
-
 * **默认管理员账号**：`admin`
 * **默认管理员密码**：`123456`
+
+### 2. Linux / 服务器后台守护模式 (关闭终端/断开 SSH 持续运行)
+无需编译，源码与打包二进制均原生支持标准服务生命周期管理：
+```bash
+# 1. 后台静默启动 (自动脱离终端，记录 PID 至 app.pid，重定向日志至 app.log，立即返回命令行)
+go run main.go start      # 源码方式
+./dist/app start          # 二进制方式
+
+# 2. 查看运行状态 (检测存活性与 PID)
+go run main.go status     # 或 ./dist/app status
+
+# 3. 动态查看后台日志 (按 Ctrl+C 仅退出查看，不影响程序运行)
+tail -f app.log
+
+# 4. 平滑安全停止服务 (优雅停机并清理 PID 文件)
+go run main.go stop       # 或 ./dist/app stop
+
+# 5. 一键平滑重启服务
+go run main.go restart    # 或 ./dist/app restart
+```
 
 ---
 
@@ -38,16 +57,20 @@ go run main.go
 项目基于 **纯 Go 标准库（0 外部依赖）** 实现三层动态配置装配：
 
 * **开箱即用**：首次运行若未检测到配置文件，程序将**自动在当前目录生成一份格式化的 `config.json`**。
-* **修改端口与数据库**：直接使用任意文本编辑器（如记事本）打开 `config.json` 即可调整：
+* **修改端口、守护模式与数据库**：直接使用任意文本编辑器（如记事本）打开 `config.json` 即可调整：
   ```json
   {
     "app": {
       "name": "Godeniter Starter Application",
       "port": ":8080",
       "env": "development",
-      "session_key": "godeniter-starter-secret-salt-2026"
+      "session_key": "godeniter-starter-secret-salt-2026",
+      "daemon": false,
+      "pid_file": "./app.pid",
+      "log_file": "./app.log"
     },
     "database": {
+
       "driver": "sqlite",
       "dsn": "./data/app.db",
       "max_open_conns": 1,
