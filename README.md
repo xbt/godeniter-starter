@@ -61,6 +61,17 @@ go run main.go
     }
   }
   ```
+* **连接 MySQL 生产数据库**：若需切换至 MySQL，仅需在 `config.json` 中配置：
+  ```json
+  "database": {
+    "driver": "mysql",
+    "dsn": "root:password@tcp(127.0.0.1:3306)/your_db?charset=utf8mb4&parseTime=True&loc=Local",
+    "max_open_conns": 50,
+    "max_idle_conns": 10,
+    "conn_max_lifetime": 3600
+  }
+  ```
+  *(详见 [《数据库与 ActiveRecord 开发手册 (docs/database.md)》](../godeniter/docs/database.md) 中的 MySQL 实战完整示例)*
 * **云原生 / 容器化覆盖**：支持通过系统环境变量（如 `PORT=:9000`、`DATABASE_DSN="..."`）动态覆盖对应字段。
 
 ---
