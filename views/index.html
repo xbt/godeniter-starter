@@ -5,54 +5,162 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{{ .Title }}</title>
     <style>
-        * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
-        body { background: #0f172a; color: #f8fafc; padding: 40px 20px; display: flex; justify-content: center; }
-        .container { max-width: 900px; width: 100%; background: #1e293b; border: 1px solid #334155; border-radius: 12px; padding: 30px; box-shadow: 0 10px 25px rgba(0,0,0,0.3); }
-        header { display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #334155; padding-bottom: 16px; margin-bottom: 24px; }
-        .logo { font-size: 20px; font-weight: 700; color: #38bdf8; }
-        .hero { background: #0c4a6e; border-left: 4px solid #0284c7; padding: 14px 18px; border-radius: 6px; margin-bottom: 24px; font-size: 13px; color: #e0f2fe; }
-        .user-box a { color: #38bdf8; text-decoration: none; font-size: 13px; margin-left: 12px; }
-        .item { background: #0f172a; border: 1px solid #334155; border-radius: 8px; padding: 16px; margin-bottom: 12px; }
-        .item-title { font-weight: 600; color: #fff; margin-bottom: 6px; font-size: 15px; }
-        .item-meta { font-size: 12px; color: #94a3b8; margin-bottom: 6px; }
-        .item-content { font-size: 13px; color: #cbd5e1; }
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif; }
+        body { background-color: #f8fafc; color: #1e293b; min-height: 100vh; display: flex; flex-direction: column; }
+        
+        /* 顶部导航条 */
+        header { background: #ffffff; border-bottom: 1px solid #e2e8f0; position: sticky; top: 0; z-index: 10; }
+        .nav-container { max-width: 960px; margin: 0 auto; padding: 14px 20px; display: flex; justify-content: space-between; align-items: center; }
+        .logo { font-size: 18px; font-weight: 700; color: #0284c7; text-decoration: none; display: flex; align-items: center; gap: 8px; }
+        .nav-actions { display: flex; align-items: center; gap: 12px; font-size: 14px; }
+        .user-tag { background: #f1f5f9; color: #475569; padding: 4px 10px; border-radius: 20px; font-size: 13px; }
+        .btn-link { color: #0284c7; text-decoration: none; font-weight: 500; }
+        .btn-link:hover { text-decoration: underline; }
+        .btn-primary { background: #0284c7; color: #ffffff; padding: 6px 14px; border-radius: 6px; text-decoration: none; font-weight: 500; border: none; cursor: pointer; transition: background 0.15s; }
+        .btn-primary:hover { background: #0369a1; }
+        
+        /* 主体内容 */
+        main { max-width: 960px; width: 100%; margin: 24px auto; padding: 0 20px; flex: 1; }
+        
+        /* 闪存提示条 */
+        .flash-notice { background: #ecfdf5; border-left: 4px solid #10b981; color: #065f46; padding: 12px 16px; border-radius: 6px; margin-bottom: 20px; font-size: 14px; box-shadow: 0 1px 2px rgba(0,0,0,0.05); }
+        
+        /* 浅色横幅 */
+        .hero { background: #f0f9ff; border: 1px solid #bae6fd; border-radius: 8px; padding: 18px 20px; margin-bottom: 24px; color: #0369a1; }
+        .hero h2 { font-size: 16px; margin-bottom: 6px; font-weight: 600; }
+        .hero p { font-size: 13px; color: #0c4a6e; line-height: 1.6; }
+        
+        /* 搜索框区域 */
+        .search-section { background: #ffffff; border: 1px solid #e2e8f0; border-radius: 8px; padding: 16px 20px; margin-bottom: 24px; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 1px 2px rgba(0,0,0,0.02); }
+        .search-form { display: flex; gap: 8px; width: 100%; max-width: 500px; }
+        .search-input { flex: 1; padding: 8px 12px; border: 1px solid #cbd5e1; border-radius: 6px; font-size: 14px; color: #1e293b; background: #fff; }
+        .search-input:focus { outline: none; border-color: #0284c7; box-shadow: 0 0 0 2px rgba(2,132,199,0.15); }
+        .search-stats { font-size: 13px; color: #64748b; }
+        .clear-search { color: #ef4444; text-decoration: none; margin-left: 8px; font-size: 12px; }
+        
+        /* 文章卡片列表 */
+        .article-card { background: #ffffff; border: 1px solid #e2e8f0; border-radius: 8px; padding: 20px; margin-bottom: 16px; transition: transform 0.15s, border-color 0.15s, box-shadow 0.15s; box-shadow: 0 1px 3px rgba(0,0,0,0.03); }
+        .article-card:hover { border-color: #93c5fd; box-shadow: 0 4px 10px rgba(0,0,0,0.05); transform: translateY(-1px); }
+        .article-title { font-size: 17px; font-weight: 600; margin-bottom: 8px; }
+        .article-title a { color: #0f172a; text-decoration: none; transition: color 0.15s; }
+        .article-title a:hover { color: #0284c7; }
+        .article-meta { display: flex; align-items: center; gap: 12px; font-size: 12px; color: #64748b; margin-bottom: 10px; }
+        .badge-view { background: #eff6ff; color: #2563eb; padding: 2px 8px; border-radius: 12px; font-weight: 500; }
+        .badge-author { background: #f8fafc; color: #475569; border: 1px solid #e2e8f0; padding: 2px 8px; border-radius: 12px; }
+        .article-desc { font-size: 14px; color: #475569; line-height: 1.6; margin-bottom: 12px; }
+        .read-more { font-size: 13px; color: #0284c7; text-decoration: none; font-weight: 500; display: inline-flex; align-items: center; }
+        .read-more:hover { text-decoration: underline; }
+        
+        /* 分页器组件 */
+        .pagination { display: flex; justify-content: center; align-items: center; gap: 6px; margin: 30px 0; font-size: 14px; }
+        .page-btn { padding: 6px 12px; border: 1px solid #cbd5e1; background: #ffffff; color: #334155; border-radius: 6px; text-decoration: none; transition: all 0.15s; }
+        .page-btn:hover { background: #f1f5f9; border-color: #94a3b8; }
+        .page-btn.active { background: #0284c7; color: #ffffff; border-color: #0284c7; font-weight: 600; cursor: default; }
+        .page-info { margin-left: 12px; color: #64748b; font-size: 13px; }
+        
+        /* 底部版权 */
+        footer { text-align: center; padding: 20px; font-size: 13px; color: #94a3b8; border-top: 1px solid #e2e8f0; background: #ffffff; }
     </style>
 </head>
 <body>
-    <div class="container">
-        <header>
-            <div class="logo">🚀 {{ .Title }}</div>
-            <div class="user-box">
+    <header>
+        <div class="nav-container">
+            <a href="/" class="logo">🚀 Godeniter Starter</a>
+            <div class="nav-actions">
                 {{ if .CurrentUser }}
-                    <span>你好，<strong>{{ .CurrentUser }}</strong></span>
-                    <a href="/logout">退出登录</a>
+                    <span class="user-tag">👤 管理员: {{ .CurrentUser }}</span>
+                    <a href="/admin/articles" class="btn-primary">后台管理</a>
+                    <a href="/logout" class="btn-link">退出</a>
                 {{ else }}
-                    <span>访客身份</span>
-                    <a href="/login">管理员登录 &rarr;</a>
+                    <span class="user-tag">访客模式</span>
+                    <a href="/login" class="btn-primary">管理员登录</a>
                 {{ end }}
             </div>
-        </header>
+        </div>
+    </header>
 
+    <main>
         {{ if .FlashNotice }}
-        <div style="background: #064e3b; border-left: 4px solid #10b981; color: #a7f3d0; padding: 12px 16px; border-radius: 6px; margin-bottom: 20px; font-size: 13px;">
+        <div class="flash-notice">
             {{ .FlashNotice }}
         </div>
         {{ end }}
 
         <div class="hero">
-            💡 本项目由 <strong>godeniter-starter</strong> 模板脚手架生成，基于 Godeniter 2.0 驱动。0 外部依赖，支持单文件极速打包分发！
-            <br>
-            <small style="color: #94a3b8;">系统唯一实例标识 (str.UUID): {{ .RandomUUID }}</small>
+            <h2>💡 基于 Godeniter 2.0 纯标准库驱动的高性能脚手架</h2>
+            <p>
+                当前演示文章已内置 8 篇，每页展示 5 条，支持<strong>动态模糊检索</strong>、<strong>分页下钻</strong>与<strong>点击标题查看详情（自动自增阅读量）</strong>。
+                <br>
+                系统唯一会话 UUID: <code>{{ .RandomUUID }}</code>
+            </p>
         </div>
 
-        <h3 style="font-size: 16px; margin-bottom: 14px;">📚 最新文章列表 (共 {{ .TotalCount }} 条)</h3>
-        {{ range .Articles }}
-        <div class="item">
-            <div class="item-title">#{{ .ID }} {{ .Title }}</div>
-            <div class="item-meta">作者 (脱敏): <span style="color: #38bdf8;">{{ .AuthorMask }}</span> | 阅读量: {{ .Views }}</div>
-            <div class="item-content">{{ .Content }}</div>
+        <!-- 搜索工具栏 -->
+        <div class="search-section">
+            <form action="/" method="GET" class="search-form">
+                <input type="text" name="keyword" class="search-input" value="{{ .Keyword }}" placeholder="输入文章标题或正文关键词搜索...">
+                <button type="submit" class="btn-primary">搜索</button>
+            </form>
+            <div class="search-stats">
+                {{ if .Keyword }}
+                    包含 "<strong>{{ .Keyword }}</strong>" 的结果共 {{ .TotalCount }} 篇
+                    <a href="/" class="clear-search">[清除搜索]</a>
+                {{ else }}
+                    文章库总数：<strong>{{ .TotalCount }}</strong> 篇 (每页 5 条)
+                {{ end }}
+            </div>
+        </div>
+
+        <!-- 文章列表展示 -->
+        <div class="articles-list">
+            {{ if .Articles }}
+                {{ range .Articles }}
+                <div class="article-card">
+                    <div class="article-title">
+                        <a href="/article/{{ .ID }}">#{{ .ID }} {{ .Title }}</a>
+                    </div>
+                    <div class="article-meta">
+                        <span class="badge-author">✍️ {{ .AuthorMask }}</span>
+                        <span class="badge-view">👀 {{ .Views }} 次浏览</span>
+                        <span>📅 {{ .CreatedAt.Format "2006-01-02 15:04" }}</span>
+                    </div>
+                    <div class="article-desc">{{ .Content }}</div>
+                    <a href="/article/{{ .ID }}" class="read-more">阅读详情 &rarr;</a>
+                </div>
+                {{ end }}
+            {{ else }}
+                <div style="text-align: center; padding: 40px; background: #fff; border-radius: 8px; border: 1px dashed #cbd5e1; color: #64748b;">
+                    未找到匹配的文章，试试其他关键词吧！
+                </div>
+            {{ end }}
+        </div>
+
+        <!-- 分页组件 -->
+        {{ if gt .TotalPages 1 }}
+        <div class="pagination">
+            {{ if .HasPrev }}
+                <a href="/?keyword={{ $.Keyword }}&page={{ $.PrevPage }}" class="page-btn">&laquo; 上一页</a>
+            {{ end }}
+
+            {{ range .Pages }}
+                {{ if eq . $.CurrentPage }}
+                    <span class="page-btn active">{{ . }}</span>
+                {{ else }}
+                    <a href="/?keyword={{ $.Keyword }}&page={{ . }}" class="page-btn">{{ . }}</a>
+                {{ end }}
+            {{ end }}
+
+            {{ if .HasNext }}
+                <a href="/?keyword={{ $.Keyword }}&page={{ $.NextPage }}" class="page-btn">下一页 &raquo;</a>
+            {{ end }}
+
+            <span class="page-info">第 {{ .CurrentPage }} / {{ .TotalPages }} 页 (共 {{ .TotalCount }} 条)</span>
         </div>
         {{ end }}
-    </div>
+    </main>
+
+    <footer>
+        Godeniter 2.0 Web Framework &bull; 0 外部依赖 &bull; 极速单文件发布
+    </footer>
 </body>
 </html>
