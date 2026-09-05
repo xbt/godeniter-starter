@@ -214,22 +214,23 @@ build.bat      # Windows
 
 ---
 
-## 🔏 UPX 极速瘦身与 Windows 数字签名 (防拦截)
+## 🔏 (可选) UPX 极速瘦身与 Windows 数字签名 (防拦截)
 
-若需要将体积从 9.5MB 压缩至 3MB，并消除 Windows SmartScreen 蓝底拦截弹窗：
+若需要进一步缩减可执行文件体积，并消除 Windows SmartScreen 蓝底拦截弹窗：
 
-1. **UPX 极速压缩**（可选，压缩至 3MB 左右）：
+1. **UPX 极速压缩**（可选）：
    ```bash
    upx --best dist/app.exe
    ```
-2. **纯 Go 工具一键生成专属自签名代码证书**（0 依赖）：
+2. **本地生成专属自签名代码证书**（纯 Go 标准库 0 依赖）：
    ```bash
    go run github.com/xbt/godeniter/cmd/cert -name "我的软件工作室" -out ./certs
    ```
+   *(执行后在本地 `./certs/` 目录下生成专属私钥和公钥 `app_codesign.cer`)*
 3. **执行代码签名**：
    * 在 Mac/Linux 上：`osslsigncode sign -pkcs12 certs/app_codesign.pfx -pass 123456 -in dist/app.exe -out dist/app_signed.exe`
    * 在 Windows 上：`signtool sign /f certs\app_codesign.pfx /p 123456 dist\app.exe`
-4. **客户机一键信任**：客户机以管理员权限执行 `certutil -addstore -f "ROOT" app_codesign.cer`，软件从此双击秒开，永不弹未知发布者拦截！
+4. **客户机一键信任**：把生成的公钥 `app_codesign.cer` 给客户电脑，以管理员权限执行 `certutil -addstore -f "ROOT" app_codesign.cer`，软件从此双击秒开，永不弹未知发布者拦截！
    *(详见 [《Windows 数字签名与代码证书实战手册》](../godeniter/docs/code_signing.md))*
 
 ---

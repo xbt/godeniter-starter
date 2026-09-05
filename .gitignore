@@ -21,13 +21,13 @@
 # Windows 编译资源
 *.syso
 
-# 证书与私钥 (绝对保密，严禁提交 Git！)
-certs/
+# 证书私钥与签名包 (绝对保密，严禁提交 Git！)
 *.key
 *.pfx
 *.p12
-*.cer
-*.crt
+certs/*.key
+certs/*.pfx
+certs/*.p12
 
 # 本地数据文件
 /data/*
