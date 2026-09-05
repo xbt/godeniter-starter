@@ -21,7 +21,6 @@ type AppConfig struct {
 	Env        string `json:"env"`         // 运行环境: development / production
 	SessionKey string `json:"session_key"` // Session 加密签名密钥
 	Daemon     bool   `json:"daemon"`      // 是否启用守护进程模式 (默认: false 前台运行，true 后台静默运行)
-	Tray       bool   `json:"tray"`        // 是否启用桌面系统托盘模式 (默认: false)
 	PIDFile    string `json:"pid_file"`    // 守护进程 PID 文件存储路径 (默认: "./app.pid")
 	LogFile    string `json:"log_file"`    // 守护进程运行日志存储路径 (默认: "./app.log")
 }
@@ -51,7 +50,6 @@ func DefaultConfig() *Config {
 			Env:        "development",
 			SessionKey: "godeniter-starter-secret-salt-2026",
 			Daemon:     false,
-			Tray:       false,
 			PIDFile:    "./app.pid",
 			LogFile:    "./app.log",
 		},
@@ -127,9 +125,6 @@ func LoadConfig(configPaths ...string) *Config {
 	}
 	if d := os.Getenv("APP_DAEMON"); d == "true" || d == "1" {
 		cfg.App.Daemon = true
-	}
-	if t := os.Getenv("APP_TRAY"); t == "true" || t == "1" {
-		cfg.App.Tray = true
 	}
 	if pidFile := os.Getenv("PID_FILE"); pidFile != "" {
 		cfg.App.PIDFile = pidFile
