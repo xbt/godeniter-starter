@@ -17,3 +17,18 @@
 .vscode/
 *.swp
 *.DS_Store
+
+# Windows 编译资源
+*.syso
+
+# 证书与私钥 (绝对保密，严禁提交 Git！)
+certs/
+*.key
+*.pfx
+*.p12
+*.cer
+*.crt
+
+# 本地数据文件
+/data/*
+!/data/.gitkeep

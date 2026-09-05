@@ -214,6 +214,26 @@ build.bat      # Windows
 
 ---
 
+## 🔏 UPX 极速瘦身与 Windows 数字签名 (防拦截)
+
+若需要将体积从 9.5MB 压缩至 3MB，并消除 Windows SmartScreen 蓝底拦截弹窗：
+
+1. **UPX 极速压缩**（可选，压缩至 3MB 左右）：
+   ```bash
+   upx --best dist/app.exe
+   ```
+2. **纯 Go 工具一键生成专属自签名代码证书**（0 依赖）：
+   ```bash
+   go run github.com/xbt/godeniter/cmd/cert -name "我的软件工作室" -out ./certs
+   ```
+3. **执行代码签名**：
+   * 在 Mac/Linux 上：`osslsigncode sign -pkcs12 certs/app_codesign.pfx -pass 123456 -in dist/app.exe -out dist/app_signed.exe`
+   * 在 Windows 上：`signtool sign /f certs\app_codesign.pfx /p 123456 dist\app.exe`
+4. **客户机一键信任**：客户机以管理员权限执行 `certutil -addstore -f "ROOT" app_codesign.cer`，软件从此双击秒开，永不弹未知发布者拦截！
+   *(详见 [《Windows 数字签名与代码证书实战手册》](../godeniter/docs/code_signing.md))*
+
+---
+
 ## 📄 开源许可证 (License)
 
 Godeniter Starter 脚手架工程基于宽松友好的 **[MIT License](./LICENSE)** 协议开源，允许任何个人与企业自由用于商业业务系统或闭源软件的研发与分发。
