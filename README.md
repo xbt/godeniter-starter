@@ -189,20 +189,19 @@ godeniter-starter/
 
 ---
 
-## 📦 一键编译单文件交付 (Windows .exe)
+## 📦 一键编译单文件交付 (统一全能单二进制)
 
 ```bash
-# 运行单元测试
-go test -v .
-
-# 生成 Windows 64位单文件可执行程序 (dist/app.exe / dist/app_tray.exe) 及本地二进制
-./build.sh
+# 生成 Windows 64位统一全能单文件可执行程序 (dist/app.exe) 及 macOS/Linux 本地二进制
+./build.sh     # macOS / Linux
+build.bat      # Windows
 ```
 
-生成的单文件无需安装任何环境，直接拷贝给客户，**双击即可直接运行**：
-* `dist/app.exe`：带控制台窗口（适合服务器守护进程运维或开发者前台查看日志）；
-* `dist/app_tray.exe`：**纯静默桌面托盘客户端（彻底隐藏控制台黑框）**，双击后直接常驻在 Windows 屏幕右下角托盘！
-* `dist/app`：macOS / Linux 平台统一可执行文件。
+生成的单文件无需安装任何环境，直接拷贝给客户，**统一且功能完备**：
+* `dist/app.exe`：**Windows 统一全能二进制**
+  - 在 CMD / PowerShell 中：支持 `start/status/stop/restart` 守护命令与前台日志；
+  - 桌面双击或以托盘模式运行：Windows 原生自动隐藏控制台黑框，常驻屏幕右下角托盘，提供完整右键菜单！
+* `dist/app`：**macOS / Linux 统一全能二进制**（支持 CLI 运维与顶部状态栏托盘）。
 
 ---
 

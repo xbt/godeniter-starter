@@ -10,16 +10,14 @@ if exist app.ico (
     go run github.com/xbt/godeniter/cmd/rsrc -auto
 )
 
-echo ^>^> Building single executable for Windows CLI...
+echo ^>^> Building single all-in-one executable for Windows (dist\app.exe)...
 go build -ldflags="-s -w" -o dist\app.exe .
 
-echo ^>^> Building silent GUI tray client for Windows...
-go build -ldflags="-s -w -H=windowsgui" -o dist\app_tray.exe .
+if exist dist\app_tray.exe del dist\app_tray.exe
 
 if %ERRORLEVEL% equ 0 (
     echo Build successful! Outputs:
-    echo   - dist\app.exe (Console mode)
-    echo   - dist\app_tray.exe (Silent tray mode)
+    echo   - dist\app.exe (Unified binary: CLI commands + silent tray auto-hide)
 ) else (
     echo Build failed with error %ERRORLEVEL%
 )

@@ -14,11 +14,11 @@ if [ -f "app.ico" ] || [ -f "favicon.ico" ]; then
     go run github.com/xbt/godeniter/cmd/rsrc -auto || true
 fi
 
-echo ">> Compiling for Windows 64-bit CLI (dist/app.exe)..."
+echo ">> Compiling for Windows 64-bit (dist/app.exe)..."
 CGO_ENABLED=0 GOOS=windows GOARCH=amd64 go build -ldflags="-s -w" -o ${OUTPUT_DIR}/app.exe .
 
-echo ">> Compiling for Windows 64-bit Silent GUI Tray (dist/app_tray.exe)..."
-CGO_ENABLED=0 GOOS=windows GOARCH=amd64 go build -ldflags="-s -w -H=windowsgui" -o ${OUTPUT_DIR}/app_tray.exe .
+# 移除旧的冗余产物 (若存在)
+rm -f ${OUTPUT_DIR}/app_tray.exe
 
 echo ">> Compiling for current OS (dist/app)..."
 go build -ldflags="-s -w" -o ${OUTPUT_DIR}/app .
@@ -27,7 +27,6 @@ chmod +x ${OUTPUT_DIR}/app || true
 
 echo "=========================================================="
 echo " Build successful! Single binaries created in dist/:"
-echo "   - dist/app.exe      (Windows 控制台守护进程/双击运行)"
-echo "   - dist/app_tray.exe (Windows 纯静默托盘客户端，无黑框)"
-echo "   - dist/app          (macOS/Linux 统一二进制)"
+echo "   - dist/app.exe      (Windows 统一全能二进制，支持 CLI 命令与托盘自动无黑框)"
+echo "   - dist/app          (macOS/Linux 统一全能二进制)"
 echo "=========================================================="
