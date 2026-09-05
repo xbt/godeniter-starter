@@ -224,7 +224,8 @@ build.bat      # Windows
    ```
 2. **本地生成专属自签名代码证书**（纯 Go 标准库 0 依赖）：
    ```bash
-   go run github.com/xbt/godeniter/cmd/cert -name "我的软件工作室" -out ./certs
+   # 支持参数：-name (发布者名称), -org (机构名称), -years (有效年限), -pass (密码), -out (输出目录)
+   go run github.com/xbt/godeniter/cmd/cert -name "我的软件工作室" -org "我的公司" -years 10 -out ./certs
    ```
    *(执行后在本地 `./certs/` 目录下生成专属私钥和公钥 `app_codesign.cer`)*
 3. **执行代码签名**：
