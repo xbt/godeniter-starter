@@ -72,7 +72,7 @@ go run main.go restart    # 或 ./dist/app restart
 
 项目基于 **纯 Go 标准库（0 外部依赖）** 实现三层动态配置装配：
 
-* **开箱即用**：首次运行若未检测到配置文件，程序将**自动在当前目录生成一份格式化的 `config.json`**。
+* **开箱即用与 SQLite 专属随机库名**：首次运行若未检测到配置文件，程序将**自动在当前目录生成一份格式化的 `config.json`**；若使用 SQLite 驱动，系统会自动生成带 8 位随机专属后缀的库名（如 `./data/app_k8x9m2p1.db`，或识别 `{random}` 占位符）并就地写回固化，**既杜绝默认固定库名被外部恶意探测猜测，又确保服务重启后数据持久安全**！
 * **修改端口、守护模式与数据库**：直接使用任意文本编辑器（如记事本）打开 `config.json` 即可调整：
   ```json
   {
@@ -86,9 +86,8 @@ go run main.go restart    # 或 ./dist/app restart
       "log_file": "./app.log"
     },
     "database": {
-
       "driver": "sqlite",
-      "dsn": "./data/app.db",
+      "dsn": "./data/app_{random}.db",
       "max_open_conns": 1,
       "max_idle_conns": 1,
       "conn_max_lifetime": 300

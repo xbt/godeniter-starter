@@ -5,6 +5,9 @@ import (
 	"fmt"
 	"os"
 	"strconv"
+	"strings"
+
+	"github.com/xbt/godeniter/utils/str"
 )
 
 // Config 全局配置定义
@@ -56,7 +59,7 @@ func DefaultConfig() *Config {
 
 		Database: DatabaseConfig{
 			Driver:          "sqlite",
-			DSN:             "./data/app.db",
+			DSN:             fmt.Sprintf("./data/app_%s.db", str.Random(8, str.CharsetAlphaLower+str.CharsetNumeric)),
 			MaxOpenConns:    1,
 			MaxIdleConns:    1,
 			ConnMaxLifetime: 300,
@@ -72,7 +75,8 @@ func DefaultConfig() *Config {
 // LoadConfig 加载配置（纯 Go 标准库实现，0 外部依赖）：
 // 1. 加载内置默认配置；
 // 2. 检测本地 config.json（若不存在则自动生成一份带缩进的样例配置文件）；
-// 3. 读取环境变量覆盖对应字段（方便 Docker / 云原生部署）。
+// 3. 自动识别 SQLite 随机化与持久化固化（支持 {random} 占位符与默认模板自动升级）；
+// 4. 读取环境变量覆盖对应字段（方便 Docker / 云原生部署）。
 func LoadConfig(configPaths ...string) *Config {
 	cfg := DefaultConfig()
 
@@ -80,6 +84,8 @@ func LoadConfig(configPaths ...string) *Config {
 	if len(configPaths) > 0 && configPaths[0] != "" {
 		filePath = configPaths[0]
 	}
+
+	needSave := false
 
 	// 1. 检测外部文件
 	if fileBytes, err := os.ReadFile(filePath); err == nil {
@@ -90,9 +96,30 @@ func LoadConfig(configPaths ...string) *Config {
 		}
 	} else if os.IsNotExist(err) {
 		// 若配置文件不存在，自动在当前目录生成一份初始模板供开发者或客户参考修改
+		needSave = true
+		fmt.Printf(">> [CONFIG] 未检测到配置文件，已自动在当前目录创建默认模板: %s\n", filePath)
+	}
+
+	// 2. 智能处理 SQLite 随机数据库名与持久化：
+	// 如果驱动为 sqlite，检查是否包含 {random} 占位符或仍为未保护的历史默认名称 "./data/app.db"
+	if strings.ToLower(cfg.Database.Driver) == "sqlite" {
+		if strings.Contains(cfg.Database.DSN, "{random}") {
+			randSuffix := str.Random(8, str.CharsetAlphaLower+str.CharsetNumeric)
+			cfg.Database.DSN = strings.ReplaceAll(cfg.Database.DSN, "{random}", randSuffix)
+			needSave = true
+			fmt.Printf(">> [CONFIG] SQLite 数据库识别到 {random} 占位符，已生成专属库名并固化: %s\n", cfg.Database.DSN)
+		} else if cfg.Database.DSN == "./data/app.db" || cfg.Database.DSN == "" {
+			randSuffix := str.Random(8, str.CharsetAlphaLower+str.CharsetNumeric)
+			cfg.Database.DSN = fmt.Sprintf("./data/app_%s.db", randSuffix)
+			needSave = true
+			fmt.Printf(">> [CONFIG] SQLite 数据库已自动升级为随机专属库名并固化: %s\n", cfg.Database.DSN)
+		}
+	}
+
+	// 3. 若产生随机库名或首次生成配置，固化写回配置文件
+	if needSave {
 		if dumpBytes, dumpErr := json.MarshalIndent(cfg, "", "  "); dumpErr == nil {
 			_ = os.WriteFile(filePath, dumpBytes, 0644)
-			fmt.Printf(">> [CONFIG] 未检测到配置文件，已自动在当前目录创建默认模板: %s\n", filePath)
 		}
 	}
 
