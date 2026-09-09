@@ -120,7 +120,7 @@ func setupApp(cfg *config.Config) *godeniter.Engine {
 		api.Get("/cron/jobs", func(c *godeniter.Context) {
 			c.Success(app.Cron.Jobs())
 		})
-		api.Post("/cron/trigger/:id", func(c *godeniter.Context) {
+		triggerHandler := func(c *godeniter.Context) {
 			jobID := c.Param("id")
 			err := app.Cron.Trigger(jobID)
 			if err != nil {
@@ -128,7 +128,9 @@ func setupApp(cfg *config.Config) *godeniter.Engine {
 				return
 			}
 			c.Success(godeniter.H{"message": "任务触发成功: " + jobID, "job_id": jobID})
-		})
+		}
+		api.Post("/cron/trigger/:id", triggerHandler)
+		api.Get("/cron/trigger/:id", triggerHandler)
 		api.Get("/storage/status", func(c *godeniter.Context) {
 			c.Success(godeniter.H{
 				"current_driver": "local",

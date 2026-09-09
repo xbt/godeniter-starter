@@ -545,8 +545,9 @@ admin@godeniter.dev &rarr; a***n@godeniter.dev<br>
                 .then(res => res.json())
                 .then(json => {
                     loading.style.display = 'none';
-                    if (json.code !== 200 || !json.data) {
-                        box.innerHTML = `获取失败: ${json.msg || '未知错误'}`;
+                    if ((json.code !== 0 && json.code !== 200) || !json.data) {
+                        box.className = 'result-box result-blocked';
+                        box.innerHTML = `获取失败: ${json.message || json.msg || '未知错误'}`;
                         return;
                     }
                     const jobs = json.data;
@@ -580,6 +581,7 @@ admin@godeniter.dev &rarr; a***n@godeniter.dev<br>
                 })
                 .catch(e => {
                     loading.style.display = 'none';
+                    box.className = 'result-box result-blocked';
                     box.innerHTML = `请求失败: ${e}`;
                 });
         }
@@ -594,14 +596,17 @@ admin@godeniter.dev &rarr; a***n@godeniter.dev<br>
             fetch(`/api/v1/cron/trigger/${id}`, { method: 'POST' })
                 .then(res => res.json())
                 .then(json => {
-                    if (json.code === 200) {
+                    if (json.code === 0 || json.code === 200) {
+                        box.className = 'result-box result-success';
                         box.innerHTML = `✅ <strong>指令触发成功！</strong>任务 [${id}] 已在独立协程中即时执行，正在刷新状态...`;
                         setTimeout(fetchCronJobs, 300);
                     } else {
-                        box.innerHTML = `❌ 触发失败: ${json.msg}`;
+                        box.className = 'result-box result-blocked';
+                        box.innerHTML = `❌ 触发失败: ${json.message || json.msg || '未知错误'}`;
                     }
                 })
                 .catch(e => {
+                    box.className = 'result-box result-blocked';
                     box.innerHTML = `触发请求失败: ${e}`;
                 });
         }
@@ -616,8 +621,9 @@ admin@godeniter.dev &rarr; a***n@godeniter.dev<br>
             fetch('/api/v1/storage/status')
                 .then(res => res.json())
                 .then(json => {
-                    if (json.code !== 200) {
-                        box.innerHTML = `探测失败: ${json.msg}`;
+                    if (json.code !== 0 && json.code !== 200) {
+                        box.className = 'result-box result-blocked';
+                        box.innerHTML = `探测失败: ${json.message || json.msg || '未知错误'}`;
                         return;
                     }
                     const d = json.data;
@@ -631,6 +637,7 @@ admin@godeniter.dev &rarr; a***n@godeniter.dev<br>
                     box.innerHTML = html;
                 })
                 .catch(e => {
+                    box.className = 'result-box result-blocked';
                     box.innerHTML = `请求失败: ${e}`;
                 });
         }
