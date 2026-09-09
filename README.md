@@ -147,42 +147,54 @@ go run main.go restart    # 或 ./dist/app restart
 
 ---
 
-## 📁 规范的项目目录结构
+## 📂 全工程文件与目录职责全景清单 (File Directory Index)
 
-```text
-godeniter-starter/
-├── main.go                 # 应用启动入口 (中间件挂载、路由组注册、依赖注入装配)
-├── main_test.go            # 自动化端到端测试 (中间件头、Panic恢复、文件上传、分页、CRUD)
-├── config.json             # 外部动态配置文件 (端口、数据库、上传配置)
-├── config/                 # 配置装配层
-│   └── app.go
-├── data/                   # 本地数据库存储目录 (自动创建)
-├── app/
-│   ├── controllers/        # 控制器层 (API 控制器与 Web 页面控制器)
-│   │   ├── home.go         # 前台首页、文章详情页、特性体验中心与 Panic 测试
-│   │   ├── admin.go        # 后台管理控制器 (带封面上传的列表、新建、编辑、删除 CRUD)
-│   │   ├── auth.go         # Session 登录与注销控制器
-│   │   └── api_article.go  # RESTful API 控制器 (含文件上传、分页检索与参数校验)
-│   ├── models/             # 数据实体与请求校验 DTO (含 binding 规则)
-│   │   └── article.go
-│   ├── services/           # 业务逻辑层 (Service)
-│   │   └── article.go      # 预设 8 篇文章，提供分页、搜索、自增阅读量、XSS过滤与 CRUD
-│   └── middleware/         # 自定义业务中间件
-│       ├── auth.go         # AuthRequired 登录认证拦截 (路由守卫)
-│       ├── timer.go        # ResponseTimer 响应计时与性能监控
-│       └── security.go     # SecurityHeaders 安全防护响应头
-├── views/                  # 内嵌浅色调 HTML 模板 (单文件打包)
-│   ├── index.html          # 浅色调前台首页 (含搜索框、封面卡片、分页导航)
-│   ├── detail.html         # 浅色调文章详情页 (含高清封面图、面包屑与阅读量)
-│   ├── features.html       # 浅色调框架特性全景体验中心 (可视化探针与交互测试)
-│   ├── login.html          # 浅色调登录面板 (管理员登录)
-│   ├── admin.html          # 浅色调后台管理中心 (含封面缩略图列表、操作入口)
-│   └── article_form.html   # 浅色调文章发布与编辑表单 (含封面图片选择与本地预览)
-├── uploads/                # 运行时文件上传存储目录
-│   └── images/             # 上传图片存储目录 (内置 sample_cover.svg)
-├── build.sh / build.bat    # 跨平台一键打包单文件脚本
-└── go.mod                  # 模块声明 (引入 godeniter)
-```
+本脚手架严格遵守清晰分层，以下为工程内全部源码文件与目录的职责清单：
+
+### 1. 核心启动与配置层
+| 文件路径 | 职责说明 |
+| :--- | :--- |
+| [`main.go`](./main.go) | **应用启动总入口**：加载配置、初始化 `godeniter` 引擎、挂载全局中间件、注册 HTML 模板与 Favicon、依赖注入装配、注册 Web/API 路由与生命周期管理。 |
+| [`main_test.go`](./main_test.go) | **自动化端到端测试**：覆盖中间件安全头、Server-Timing、Favicon 输出、Panic 恢复、文章分页检索、API 文件上传、后台登录与 CRUD、敏感文件 403 阻断探测以及存储驱动测试。 |
+| [`config.json`](./config.json) | **外部动态配置文件**：声明端口、Session 密钥、SQLite 驱动与 DSN 路径、文件上传限制。支持冷重启动态调整。 |
+| [`config/app.go`](./config/app.go) | **配置装配与随机数据库固化**：纯标准库解析 JSON 配置；识别 `{random}` 占位符自动生成专属 SQLite 随机库名并自动写回固化持久化；支持环境变量覆盖。 |
+| [`config/app_test.go`](./config/app_test.go) | **配置单元测试**：验证默认随机 DSN 生成机制、`{random}` 占位符自动固化写回及服务重启数据防丢失。 |
+
+### 2. 控制器层 (`app/controllers/`)
+| 控制器文件 | 职责说明 |
+| :--- | :--- |
+| [`app/controllers/home.go`](./app/controllers/home.go) | **前台页面控制器**：处理网站首页展示 (`/`)、框架特性全景体验中心 (`/features`)、文章详情阅读页 (`/article/:id`) 及故意触发 Panic 验证服务自愈的测试路由 (`/demo/panic`)。 |
+| [`app/controllers/admin.go`](./app/controllers/admin.go) | **后台管理控制器**：受 `AuthRequired` 路由守卫保护。处理文章管理列表、带封面图片上传的文章新增 (`create`)、编辑更新 (`edit`) 与删除 (`delete`)。 |
+| [`app/controllers/auth.go`](./app/controllers/auth.go) | **会话鉴权控制器**：提供管理员登录页面渲染 (`GET /login`)、账号密码校验与 Session 建立 (`POST /login`) 及安全退出 (`GET /logout`)。 |
+| [`app/controllers/api_article.go`](./app/controllers/api_article.go) | **RESTful API 控制器**：提供标准 JSON 接口：文章列表查询分页 (`GET /api/v1/articles`)、文章详情 (`GET /api/v1/articles/:id`)、创建文章 (`POST`)、删除文章 (`DELETE`) 与图片上传 (`POST /api/v1/upload`)。 |
+
+### 3. 中间件层 (`app/middleware/`)
+| 中间件文件 | 职责说明 |
+| :--- | :--- |
+| [`app/middleware/auth.go`](./app/middleware/auth.go) | **路由守卫拦截器**：检查 Session 是否存在登录态，未登录时通过 Flash 提示并 302 重定向至登录页。 |
+| [`app/middleware/security.go`](./app/middleware/security.go) | **安全标头与文件保护**：接入 `godeniter/middleware.Security()` 注入行业基准安全头；接入 `BlockSensitive()` 拦截对 `.db`、`config.json`、`.env` 的探测 (403)。 |
+| [`app/middleware/timer.go`](./app/middleware/timer.go) | **耗时监控中间件**：接入 `godeniter/middleware.ServerTiming()`，为响应注入 `X-Response-Time` 与 W3C 标准 `Server-Timing`。 |
+| [`app/middleware/keyauth.go`](./app/middleware/keyauth.go) | **API Key 鉴权中间件**：接入 `godeniter/middleware.KeyAuth()`，展示如何从 Bearer Token、X-API-Key 或 URL 参数提取密钥并执行鉴权。 |
+
+### 4. 业务服务与数据模型层 (`app/services/` & `app/models/`)
+| 文件路径 | 职责说明 |
+| :--- | :--- |
+| [`app/services/article.go`](./app/services/article.go) | **文章业务服务**：内存线程安全并发管理；预装 8 篇打样文章；提供分页、模糊检索、自增阅读量、XSS 安全过滤及 CRUD 操作。 |
+| [`app/services/storage.go`](./app/services/storage.go) | **多存储驱动演示工厂**：展示如何使用 `godeniter/storage.Driver`；默认使用本地磁盘存储驱动，并在代码中演示如何一行切换到 WebDAV 或 S3 / Cloudflare R2 / 阿里云 OSS 云对象存储。 |
+| [`app/models/article.go`](./app/models/article.go) | **数据实体与校验 DTO**：定义 `Article` 核心模型；定义 API 请求绑定 `CreateArticleRequest`、分页查询 `ArticleQueryRequest` 及带结构体 Tag 自动校验的表单 `FormArticleRequest`。 |
+
+### 5. 视图模板与静态资源 (`views/` & `uploads/`)
+| 目录 / 资源 | 职责说明 |
+| :--- | :--- |
+| [`views/index.html`](./views/index.html) | **前台首页模板**：浅色优雅卡片设计，包含顶部导航、文章模糊搜索框、封面展示与分页条。 |
+| [`views/detail.html`](./views/detail.html) | **文章详情模板**：展示大图封面、发布时间、脱敏作者信息、阅读量计数与正文排版。 |
+| [`views/features.html`](./views/features.html) | **特性全景体验中心**：提供在线功能探针，直观展示依赖注入、中间件响应头、单文件打包与 Session 机制。 |
+| [`views/login.html`](./views/login.html) | **后台登录面板**：支持回车提交、Session Flash 错误提示与优雅卡片居中布局。 |
+| [`views/admin.html`](./views/admin.html) | **后台管理列表页**：展示文章封面微缩图、标题、作者、阅读数与编辑/删除操作栏。 |
+| [`views/article_form.html`](./views/article_form.html) | **文章发布/编辑表单**：支持选择本地封面即时预览，配合结构体 Tag 字段错误高亮提示。 |
+| [`app.ico`](./app.ico) | **应用专属图标**：纯标准库 Windows 资源编译器与浏览器 Favicon 统一图标源文件。 |
+| [`uploads/images/`](./uploads/images/) | **运行时上传目录**：内置 `sample_cover.svg` 缺省封面矢量图，作为上传文件的分发目录。 |
+| [`build.sh` / `build.bat`](./build.sh) | **一键单文件打包脚本**：自动化探测图标编译 `.syso` 并产出 Windows 64位与 macOS/Linux 独立全能二进制。 |
 
 ---
 

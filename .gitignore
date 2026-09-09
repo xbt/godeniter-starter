@@ -6,6 +6,8 @@
 *.dylib
 
 # 运行时上传文件与日志 PID
+/uploads/images/*
+!/uploads/images/sample_cover.svg
 /uploads/*
 !/uploads/.gitkeep
 *.log
