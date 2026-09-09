@@ -36,9 +36,13 @@ go run main.go restart    # 或 ./dist/app restart
 ```
 
 ### 3. 跨平台桌面系统托盘 / 状态栏客户端模式 (macOS / Windows 常驻)
-若您希望将本 Web 服务作为独立的本地客户端或桌面托盘分发给用户使用：
-* **默认开箱即用（无参数直接运行 / 双击）**：
-  在 Windows 和 macOS 桌面环境下，直接执行或双击程序，**默认自动以系统托盘模式启动**，无需任何命令行参数：
+若您希望将本 Web 服务作为独立的本地客户端或桌面托盘常驻运行：
+* **进入托盘模式**：
+  在终端中传入 `tray` 参数启动：
+  ```bash
+  go run main.go tray      # 源码方式
+  ./dist/app tray          # 二进制方式 (Windows 自动隐藏控制台黑框)
+  ```
   * **Windows**：Win32 原生自动隐藏控制台黑框，右下角任务栏托盘图标优雅常驻，右键弹出管理菜单，双击图标直接打开浏览器后台；
   * **macOS**：顶部状态栏常驻图标，点击展开管理菜单。
 * **常驻原生菜单**：
@@ -46,10 +50,6 @@ go run main.go restart    # 或 ./dist/app restart
   * 📁 **打开应用目录**：调起系统文件管理器 (Explorer / Finder) 定位应用目录，方便查找 `config.json` 与数据文件；
   * ℹ️ **关于系统**：弹窗展示应用名称、版本、运行端口与进程 PID 等信息；
   * ⏹️ **退出程序**：平滑优雅关闭 Web 服务并安全退出，托盘图标无感清理。
-* **开发者控制台调试模式**：若需要在终端中查看彩色 ASCII Banner 与实时请求日志，只需传入 `console` 或 `run` 参数：
-  ```bash
-  go run main.go console      # 或 ./dist/app console
-  ```
 
 ---
 

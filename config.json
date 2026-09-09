@@ -8,10 +8,9 @@
     "pid_file": "./app.pid",
     "log_file": "./app.log"
   },
-
   "database": {
     "driver": "sqlite",
-    "dsn": "./data/app_{random}.db",
+    "dsn": "./data/app_g7iw35oe.db",
     "max_open_conns": 1,
     "max_idle_conns": 1,
     "conn_max_lifetime": 300

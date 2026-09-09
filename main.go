@@ -8,7 +8,6 @@ import (
 	"io/fs"
 	"net/http"
 	"os"
-	"runtime"
 	"strings"
 	"time"
 
@@ -128,11 +127,11 @@ func main() {
 	app := setupApp(cfg)
 
 	// 3. 命令行参数与运行模式判定:
-	// - 无参数直接运行 (如 Windows / macOS 桌面双击): 默认以系统托盘模式启动，Win32 原生自动隐藏黑框！
+	// - 无参数直接运行: 默认采用控制台前台模式 (实时输出彩色 ASCII Banner 与请求日志)
 	// - 显式子命令:
-	//     tray: 强制托盘模式
-	//     console / run: 显式前台控制台调试模式 (不隐藏黑框，实时查看彩色 Banner 与请求日志)
-	//     start / stop / restart / status: 守护进程管理器接管
+	//     tray: 桌面系统托盘模式 (Win32 原生自动隐藏黑框，macOS 顶部状态栏常驻)
+	//     console / run: 显式前台控制台调试模式
+	//     start / stop / restart / status: 后台守护进程管理器接管
 	cmd := ""
 	if len(os.Args) > 1 {
 		cmd = strings.ToLower(os.Args[1])
@@ -147,10 +146,8 @@ func main() {
 	case "start", "stop", "restart", "status":
 		isTrayMode = false
 	default:
-		// 无参数或常规直接运行：在具备桌面图形界面的环境 (Windows / macOS) 下默认直接进入托盘模式
-		if runtime.GOOS == "windows" || runtime.GOOS == "darwin" {
-			isTrayMode = true
-		}
+		// 命令行无参数直接运行：默认采用开发者控制台模式 (实时输出彩色 ASCII Banner 与请求日志)
+		isTrayMode = false
 	}
 
 	if isTrayMode {
