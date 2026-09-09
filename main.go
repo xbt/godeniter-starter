@@ -120,6 +120,26 @@ func setupApp(cfg *config.Config) *godeniter.Engine {
 		api.Get("/cron/jobs", func(c *godeniter.Context) {
 			c.Success(app.Cron.Jobs())
 		})
+		api.Post("/cron/trigger/:id", func(c *godeniter.Context) {
+			jobID := c.Param("id")
+			err := app.Cron.Trigger(jobID)
+			if err != nil {
+				c.Fail(400, err.Error())
+				return
+			}
+			c.Success(godeniter.H{"message": "任务触发成功: " + jobID, "job_id": jobID})
+		})
+		api.Get("/storage/status", func(c *godeniter.Context) {
+			c.Success(godeniter.H{
+				"current_driver": "local",
+				"upload_dir":     cfg.Upload.Dir,
+				"supported_drivers": []godeniter.H{
+					{"driver": "local", "name": "Local 本地磁盘驱动", "status": "active", "desc": "零外部依赖，极速本地读写"},
+					{"driver": "webdav", "name": "WebDAV 云盘/NAS 驱动", "status": "supported", "desc": "原生 HTTP WebDAV 协议，支持群晖 NAS、Nextcloud、坚果云"},
+					{"driver": "s3", "name": "Amazon S3 / MinIO 驱动", "status": "supported", "desc": "手写纯标准库 SigV4 认证，0-SDK 依赖，兼容 Cloudflare R2 / 阿里云 OSS"},
+				},
+			})
+		})
 	}
 
 	// 11. 自定义 404 未命中页面

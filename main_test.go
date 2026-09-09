@@ -99,8 +99,31 @@ func TestFeaturesPage(t *testing.T) {
 	if w.Code != http.StatusOK {
 		t.Fatalf("特性中心应返回 200，实际: %d", w.Code)
 	}
-	if !strings.Contains(w.Body.String(), "框架特性全景体验中心") {
+	body := w.Body.String()
+	if !strings.Contains(body, "框架特性全景体验中心") {
 		t.Errorf("页面未包含特性体验中心标题")
+	}
+	// 验证 14 项关键特性卡片均完整呈现
+	expectedKeywords := []string{
+		"内置秒级与 Linux Crontab 调度引擎",
+		"纯 Go 多存储驱动",
+		"跨平台桌面托盘与无黑框运行",
+		"跨平台守护进程服务化",
+		"敏感文件与黑客探测主动防御",
+		"强类型反射依赖注入与上下文解耦",
+		"纯 Go 0-CGO 嵌入式 SQLite 与链式 ORM",
+		"W3C Server-Timing 与安全防护标头",
+		"Panic 优雅恢复与故障隔离",
+		"无侵入 HTML 注释模板渲染语法",
+		"封面上传与静态资源极速分发",
+		"零依赖参数校验器",
+		"敏感数据脱敏与 XSS 脚本过滤",
+		"零依赖 JSON 配置与一键独立打包",
+	}
+	for _, kw := range expectedKeywords {
+		if !strings.Contains(body, kw) {
+			t.Errorf("特性页面应包含核心卡片 [%s]", kw)
+		}
 	}
 }
 
@@ -440,5 +463,40 @@ func TestStarterCronScheduler(t *testing.T) {
 	if !strings.Contains(w.Body.String(), "heartbeat") {
 		t.Errorf("API 未返回 heartbeat 任务")
 	}
+
+	// 3. 测试通过 API 手动立即触发任务
+	wTrigger := httptest.NewRecorder()
+	reqTrigger, _ := http.NewRequest("POST", "/api/v1/cron/trigger/heartbeat", nil)
+	app.ServeHTTP(wTrigger, reqTrigger)
+	if wTrigger.Code != http.StatusOK {
+		t.Fatalf("预期触发任务返回 200，实际: %d", wTrigger.Code)
+	}
+
+	// 4. 测试触发不存在的任务返回业务错误码 400
+	wErr := httptest.NewRecorder()
+	reqErr, _ := http.NewRequest("POST", "/api/v1/cron/trigger/not_exist_job", nil)
+	app.ServeHTTP(wErr, reqErr)
+	if !strings.Contains(wErr.Body.String(), `"code":400`) {
+		t.Fatalf("触发不存在的任务预期返回业务错误码 400，实际响应: %s", wErr.Body.String())
+	}
 }
+
+// TestStarterStorageStatusAPI 验证存储驱动状态端点
+func TestStarterStorageStatusAPI(t *testing.T) {
+	cfg := config.DefaultConfig()
+	app := setupApp(cfg)
+
+	w := httptest.NewRecorder()
+	req, _ := http.NewRequest("GET", "/api/v1/storage/status", nil)
+	app.ServeHTTP(w, req)
+
+	if w.Code != http.StatusOK {
+		t.Fatalf("预期返回 200，实际: %d", w.Code)
+	}
+	body := w.Body.String()
+	if !strings.Contains(body, "current_driver") || !strings.Contains(body, "supported_drivers") {
+		t.Errorf("响应缺少存储驱动字段: %s", body)
+	}
+}
+
 

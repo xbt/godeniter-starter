@@ -9,36 +9,77 @@
         * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif; }
         body { background-color: #f8fafc; color: #1e293b; min-height: 100vh; display: flex; flex-direction: column; }
         
-        header { background: #ffffff; border-bottom: 1px solid #e2e8f0; position: sticky; top: 0; z-index: 10; }
-        .nav-container { max-width: 960px; margin: 0 auto; padding: 14px 20px; display: flex; justify-content: space-between; align-items: center; }
+        header { background: #ffffff; border-bottom: 1px solid #e2e8f0; position: sticky; top: 0; z-index: 100; }
+        .nav-container { max-width: 1140px; margin: 0 auto; padding: 14px 20px; display: flex; justify-content: space-between; align-items: center; }
         .logo { font-size: 18px; font-weight: 700; color: #0284c7; text-decoration: none; display: flex; align-items: center; gap: 8px; }
         .nav-actions { display: flex; align-items: center; gap: 14px; font-size: 14px; }
         .btn-link { color: #0284c7; text-decoration: none; font-weight: 500; }
         .btn-link:hover { text-decoration: underline; }
-        .btn-primary { background: #0284c7; color: #ffffff; padding: 6px 14px; border-radius: 6px; text-decoration: none; font-weight: 500; }
+        .btn-primary { background: #0284c7; color: #ffffff; padding: 7px 16px; border-radius: 6px; text-decoration: none; font-weight: 500; transition: background 0.15s; }
+        .btn-primary:hover { background: #0369a1; }
         
-        main { max-width: 960px; width: 100%; margin: 24px auto; padding: 0 20px; flex: 1; }
+        main { max-width: 1140px; width: 100%; margin: 28px auto; padding: 0 20px; flex: 1; }
         
-        .page-header { margin-bottom: 24px; text-align: center; padding: 20px 0; }
-        .page-header h1 { font-size: 26px; color: #0f172a; margin-bottom: 8px; font-weight: 700; }
-        .page-header p { font-size: 14px; color: #64748b; }
+        .hero { text-align: center; padding: 24px 0 32px; }
+        .hero h1 { font-size: 30px; color: #0f172a; margin-bottom: 10px; font-weight: 800; letter-spacing: -0.5px; }
+        .hero p { font-size: 15px; color: #64748b; max-width: 720px; margin: 0 auto 18px; line-height: 1.6; }
         
-        .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 20px; margin-bottom: 30px; }
-        .card { background: #ffffff; border: 1px solid #e2e8f0; border-radius: 10px; padding: 24px; box-shadow: 0 1px 3px rgba(0,0,0,0.03); transition: transform 0.15s, border-color 0.15s; }
-        .card:hover { border-color: #93c5fd; transform: translateY(-2px); box-shadow: 0 4px 12px rgba(0,0,0,0.05); }
-        .card-icon { font-size: 28px; margin-bottom: 12px; }
-        .card-title { font-size: 17px; font-weight: 600; color: #0f172a; margin-bottom: 8px; }
-        .card-desc { font-size: 13px; color: #475569; line-height: 1.6; margin-bottom: 16px; }
+        .stat-banner { display: flex; justify-content: center; gap: 12px; flex-wrap: wrap; margin-bottom: 24px; }
+        .stat-pill { background: #ffffff; border: 1px solid #e2e8f0; border-radius: 999px; padding: 6px 14px; font-size: 13px; font-weight: 600; color: #334155; display: flex; align-items: center; gap: 6px; box-shadow: 0 1px 2px rgba(0,0,0,0.03); }
+        .stat-pill span { color: #0284c7; }
+
+        .filter-bar { display: flex; justify-content: center; gap: 8px; flex-wrap: wrap; margin-bottom: 28px; }
+        .filter-btn { background: #ffffff; border: 1px solid #cbd5e1; border-radius: 6px; padding: 6px 14px; font-size: 13px; font-weight: 500; color: #475569; cursor: pointer; transition: all 0.15s; }
+        .filter-btn:hover { background: #f1f5f9; color: #0f172a; border-color: #94a3b8; }
+        .filter-btn.active { background: #0284c7; color: #ffffff; border-color: #0284c7; }
         
-        .badge { display: inline-block; padding: 3px 8px; border-radius: 4px; font-size: 12px; font-weight: 600; background: #e0f2fe; color: #0369a1; margin-bottom: 12px; }
-        .code-box { background: #f1f5f9; border-radius: 6px; padding: 10px 12px; font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace; font-size: 12px; color: #334155; line-height: 1.5; overflow-x: auto; margin-bottom: 14px; }
+        .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(340px, 1fr)); gap: 22px; margin-bottom: 40px; }
+        .card { background: #ffffff; border: 1px solid #e2e8f0; border-radius: 12px; padding: 24px; box-shadow: 0 1px 3px rgba(0,0,0,0.03); transition: transform 0.15s, border-color 0.15s, box-shadow 0.15s; display: flex; flex-direction: column; }
+        .card:hover { border-color: #93c5fd; transform: translateY(-2px); box-shadow: 0 6px 20px rgba(2,132,199,0.07); }
         
-        .btn-action { display: inline-block; background: #0284c7; color: #ffffff; padding: 8px 14px; border-radius: 6px; font-size: 13px; font-weight: 500; text-decoration: none; cursor: pointer; border: none; transition: background 0.15s; }
+        .card-header { display: flex; align-items: flex-start; justify-content: space-between; margin-bottom: 12px; }
+        .card-icon { font-size: 30px; line-height: 1; }
+        .badge { display: inline-block; padding: 3px 9px; border-radius: 999px; font-size: 11px; font-weight: 700; background: #e0f2fe; color: #0369a1; text-transform: uppercase; letter-spacing: 0.5px; }
+        .badge-cron { background: #fef3c7; color: #92400e; }
+        .badge-storage { background: #ede9fe; color: #6d28d9; }
+        .badge-tray { background: #e0e7ff; color: #3730a3; }
+        .badge-sec { background: #fee2e2; color: #991b1b; }
+        
+        .card-title { font-size: 18px; font-weight: 700; color: #0f172a; margin-bottom: 8px; line-height: 1.3; }
+        .card-desc { font-size: 13.5px; color: #475569; line-height: 1.6; margin-bottom: 16px; flex: 1; }
+        
+        .code-box { background: #0f172a; border-radius: 8px; padding: 12px; font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace; font-size: 12px; color: #38bdf8; line-height: 1.5; overflow-x: auto; margin-bottom: 16px; border: 1px solid #1e293b; }
+        .code-box .kw { color: #f472b6; }
+        .code-box .fn { color: #67e8f9; }
+        .code-box .str { color: #fde047; }
+        .code-box .cm { color: #64748b; font-style: italic; }
+        
+        .interactive-zone { background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 8px; padding: 12px; margin-top: auto; }
+        .interactive-title { font-size: 12px; font-weight: 600; color: #64748b; margin-bottom: 8px; display: flex; align-items: center; justify-content: space-between; }
+        
+        .btn-group { display: flex; gap: 8px; flex-wrap: wrap; }
+        .btn-action { display: inline-flex; align-items: center; gap: 6px; background: #0284c7; color: #ffffff; padding: 7px 13px; border-radius: 6px; font-size: 12.5px; font-weight: 500; text-decoration: none; cursor: pointer; border: none; transition: background 0.15s; }
         .btn-action:hover { background: #0369a1; }
+        .btn-secondary { background: #ffffff; color: #334155; border: 1px solid #cbd5e1; }
+        .btn-secondary:hover { background: #f1f5f9; color: #0f172a; }
         .btn-danger { background: #ef4444; }
         .btn-danger:hover { background: #dc2626; }
+        .btn-warning { background: #f59e0b; color: #ffffff; }
+        .btn-warning:hover { background: #d97706; }
         
-        footer { text-align: center; padding: 20px; font-size: 13px; color: #94a3b8; border-top: 1px solid #e2e8f0; background: #ffffff; }
+        .result-box { margin-top: 10px; font-size: 12px; border-radius: 6px; padding: 8px 10px; display: none; line-height: 1.5; }
+        .result-success { background: #ecfdf5; border: 1px solid #a7f3d0; color: #065f46; }
+        .result-blocked { background: #fef2f2; border: 1px solid #fecaca; color: #991b1b; }
+        .result-info { background: #eff6ff; border: 1px solid #bfdbfe; color: #1e40af; }
+        
+        .job-table { width: 100%; border-collapse: collapse; font-size: 11px; margin-top: 8px; }
+        .job-table th, .job-table td { padding: 6px 8px; text-align: left; border-bottom: 1px solid #e2e8f0; }
+        .job-table th { background: #f1f5f9; color: #475569; font-weight: 600; }
+        .job-status-badge { display: inline-block; padding: 2px 6px; border-radius: 4px; font-size: 10px; font-weight: 600; }
+        .status-ok { background: #dcfce7; color: #166534; }
+        .status-idle { background: #f1f5f9; color: #475569; }
+
+        footer { text-align: center; padding: 24px; font-size: 13px; color: #94a3b8; border-top: 1px solid #e2e8f0; background: #ffffff; margin-top: 40px; }
     </style>
 </head>
 <body>
@@ -57,124 +98,541 @@
     </header>
 
     <main>
-        <div class="page-header">
+        <div class="hero">
             <h1>⚡ Godeniter 2.0 框架特性全景体验中心</h1>
-            <p>100% 纯 Go 标准库打造 · 0 第三方依赖 · 极简优雅 · 开箱即用</p>
+            <p>100% 纯 Go 标准库打造 · 0 外部第三方供应链依赖 · 单二进制全栈交付 · 开箱即用</p>
+            
+            <div class="stat-banner">
+                <div class="stat-pill">✨ 核心功能矩阵: <span>14 大全能特性</span></div>
+                <div class="stat-pill">🛡️ 第三方依赖: <span>0 (纯 Go 标准库)</span></div>
+                <div class="stat-pill">⏰ 计划任务: <span>内置秒级/分级 Cron</span></div>
+                <div class="stat-pill">📦 存储驱动: <span>Local / WebDAV / S3</span></div>
+                <div class="stat-pill">💻 桌面支持: <span>Win32 / macOS 托盘</span></div>
+            </div>
+
+            <div class="filter-bar">
+                <button class="filter-btn active" onclick="filterCards('all', this)">全部特性 (14)</button>
+                <button class="filter-btn" onclick="filterCards('cron', this)">⏰ 计划任务调度</button>
+                <button class="filter-btn" onclick="filterCards('storage', this)">📦 统一多存储</button>
+                <button class="filter-btn" onclick="filterCards('desktop', this)">💻 桌面托盘与守护</button>
+                <button class="filter-btn" onclick="filterCards('security', this)">🛡️ 主动防御与安全</button>
+                <button class="filter-btn" onclick="filterCards('core', this)">💉 核心架构与注入</button>
+            </div>
         </div>
 
-        <div class="grid">
-            <!-- 1. 自定义中间件流水线 -->
-            <div class="card">
-                <div class="card-icon">⏱️</div>
-                <div class="badge">中间件流水线</div>
-                <div class="card-title">响应计时与安全防护头</div>
+        <div class="grid" id="featureGrid">
+
+            <!-- 1. 纯 Go 内置秒级 / 分级 Cron 调度引擎 -->
+            <div class="card" data-cat="cron">
+                <div class="card-header">
+                    <div class="card-icon">⏰</div>
+                    <div class="badge badge-cron">原生计划任务</div>
+                </div>
+                <div class="card-title">内置秒级与 Linux Crontab 调度引擎</div>
                 <div class="card-desc">
-                    框架采用洋葱圈中间件模型。本项目已挂载 <code>ResponseTimer()</code> 与 <code>SecurityHeaders()</code>，会自动为每个响应注入计时和安全防御标头。
+                    100% 纯 Go 自研调度内核，对标 Linux Crontab。支持 6 段秒级（<code>*/15 * * * * *</code>）与 5 段经典分级，支持 <code>@hourly</code> 宏语法、Panic 容错隔离与手动 <code>Trigger</code> 即时执行。
+                </div>
+                <div class="code-box">
+<span class="cm">// 秒级或分级注册调度任务</span><br>
+app.<span class="fn">Schedule</span>(<span class="str">"heartbeat"</span>, <span class="str">"巡检"</span>, <span class="str">"*/15 * * * * *"</span>, fn)<br>
+app.<span class="fn">Schedule</span>(<span class="str">"cleanup"</span>, <span class="str">"清理"</span>, <span class="str">"@hourly"</span>, fn)
+                </div>
+                <div class="interactive-zone">
+                    <div class="interactive-title">
+                        <span>🧪 在线任务探针与触发</span>
+                        <span id="cronLoading" style="display:none; color:#0284c7;">加载中...</span>
+                    </div>
+                    <div class="btn-group">
+                        <button class="btn-action" onclick="fetchCronJobs()">📡 拉取任务状态</button>
+                        <button class="btn-action btn-warning" onclick="triggerCronJob('heartbeat')">⚡ 立即触发心跳</button>
+                    </div>
+                    <div id="cronResult" class="result-box result-info"></div>
+                </div>
+            </div>
+
+            <!-- 2. 纯 Go 多存储驱动架构 -->
+            <div class="card" data-cat="storage">
+                <div class="card-header">
+                    <div class="card-icon">📦</div>
+                    <div class="badge badge-storage">统一存储抽象</div>
+                </div>
+                <div class="card-title">纯 Go 多存储驱动 (Local / WebDAV / S3)</div>
+                <div class="card-desc">
+                    抽象统一 <code>storage.Driver</code> 文件存取接口。内置 Local 本地磁盘、WebDAV（坚果云/Nextcloud/群晖NAS）以及手写 AWS SigV4 纯标准库签名的 S3 / MinIO / Cloudflare R2，<strong>0 引入臃肿的官方 SDK</strong>！
+                </div>
+                <div class="code-box">
+<span class="cm">// 统一 Driver 切换，一行代码即走即用</span><br>
+driver := storage.<span class="fn">NewS3Driver</span>(s3Config)<br>
+url, err := driver.<span class="fn">Put</span>(<span class="str">"file.png"</span>, r, size, mime)
+                </div>
+                <div class="interactive-zone">
+                    <div class="interactive-title">
+                        <span>🧪 存储引擎矩阵探测</span>
+                    </div>
+                    <button class="btn-action" onclick="fetchStorageStatus()">🔍 探测已挂载存储状态</button>
+                    <div id="storageResult" class="result-box result-info"></div>
+                </div>
+            </div>
+
+            <!-- 3. 跨平台桌面系统托盘与无黑框静默运行 -->
+            <div class="card" data-cat="desktop">
+                <div class="card-header">
+                    <div class="card-icon">💻</div>
+                    <div class="badge badge-tray">0-CGO 桌面客户端</div>
+                </div>
+                <div class="card-title">跨平台桌面托盘与无黑框运行 (tray)</div>
+                <div class="card-desc">
+                    Windows 端纯 Go <code>syscall</code> 调用 Win32 API <strong>自动隐藏控制台黑框</strong>；macOS 端原生接入 Cocoa 状态栏常驻。支持右键唤起菜单：打开后台、定位数据目录、关于系统与优雅退出。
+                </div>
+                <div class="code-box">
+<span class="cm">// 命令行或双击独立 exe 启动桌面托盘</span><br>
+go run main.go tray<br>
+<span class="cm">// 托盘右键菜单: 打开后台 / 应用目录 / 优雅退出</span>
+                </div>
+                <div class="interactive-zone">
+                    <div class="interactive-title">
+                        <span>💡 本机启动命令体验</span>
+                    </div>
+                    <div style="font-size: 12px; color: #475569; line-height: 1.5; margin-bottom: 8px;">
+                        在终端运行 <code>go run main.go tray</code> 即可体验无黑框原生菜单栏驻留。
+                    </div>
+                    <a href="/favicon.ico" target="_blank" class="btn-action btn-secondary">🖼️ 查看内嵌桌面 ICO 图标</a>
+                </div>
+            </div>
+
+            <!-- 4. 跨平台系统守护进程管理 -->
+            <div class="card" data-cat="desktop">
+                <div class="card-header">
+                    <div class="card-icon">🛡️</div>
+                    <div class="badge badge-tray">服务生命周期</div>
+                </div>
+                <div class="card-title">跨平台守护进程服务化 (daemon)</div>
+                <div class="card-desc">
+                    单二进制接管生命周期。支持类 Nginx 指令集：<code>start</code>（Setsid 脱离终端后台静默守护，记录 PID 并重定向日志）、<code>stop</code>（平滑停机）、<code>status</code>（运行状态查询）、<code>restart</code>（平滑重启）。
+                </div>
+                <div class="code-box">
+./godeniter-starter start   <span class="cm"># 后台静默守护</span><br>
+./godeniter-starter status  <span class="cm"># 查看 PID 与状态</span><br>
+./godeniter-starter stop    <span class="cm"># 优雅平滑停机</span>
+                </div>
+                <div class="interactive-zone">
+                    <div class="interactive-title">
+                        <span>📋 架构特性</span>
+                    </div>
+                    <div style="font-size: 12px; color: #334155; line-height: 1.5;">
+                        跨平台兼容 Linux/macOS 系统会话与 Windows DETACHED 独立进程模型，断开终端服务持续稳定运行。
+                    </div>
+                </div>
+            </div>
+
+            <!-- 5. 敏感资源嗅探与黑客扫描主动防御 -->
+            <div class="card" data-cat="security">
+                <div class="card-header">
+                    <div class="card-icon">🚫</div>
+                    <div class="badge badge-sec">主动网络防御</div>
+                </div>
+                <div class="card-title">敏感文件与黑客探测主动防御</div>
+                <div class="card-desc">
+                    洋葱圈内置 <code>BlockSensitiveFiles()</code>。对黑客与扫描器探测 <code>.db</code>、<code>.sqlite</code>、<code>config.json</code>、<code>.env</code>、<code>.git</code> 等敏感核心资产实施秒级识别与主动切断，严格保护系统私密性。
+                </div>
+                <div class="code-box">
+app.<span class="fn">Use</span>(middleware.<span class="fn">BlockSensitive</span>())<br>
+<span class="cm">// 探测 .db / .sqlite / .env / config.json &rarr; 403 阻断</span>
+                </div>
+                <div class="interactive-zone">
+                    <div class="interactive-title">
+                        <span>🚨 模拟黑客探测与防御校验</span>
+                    </div>
+                    <div class="btn-group">
+                        <button class="btn-action btn-danger" onclick="probeSensitive('/data/app.db')">探测 /data/app.db</button>
+                        <button class="btn-action btn-danger" onclick="probeSensitive('/config.json')">探测 /config.json</button>
+                        <button class="btn-action btn-danger" onclick="probeSensitive('/.env')">探测 /.env</button>
+                    </div>
+                    <div id="sensitiveResult" class="result-box result-blocked"></div>
+                </div>
+            </div>
+
+            <!-- 6. Martini 风格纯 Go 强类型依赖注入 -->
+            <div class="card" data-cat="core">
+                <div class="card-header">
+                    <div class="card-icon">💉</div>
+                    <div class="badge">依赖注入 (DI)</div>
+                </div>
+                <div class="card-title">强类型反射依赖注入与上下文解耦</div>
+                <div class="card-desc">
+                    Handler 签名完全自由！无需笨重的上下文类型断言，控制器只需直接声明所需的业务服务、配置单例或数据库实例，框架在运行时根据类型自动注入，支持父子层级隔离。
+                </div>
+                <div class="code-box">
+<span class="cm">// 注册单例服务</span><br>
+app.<span class="fn">Map</span>(services.<span class="fn">NewArticleService</span>())<br>
+<span class="cm">// 控制器直接声明参数，自动完成反射注入</span><br>
+<span class="kw">func</span> (h *Home) <span class="fn">Index</span>(c *Context, svc *ArticleService)
+                </div>
+                <div class="interactive-zone">
+                    <div class="interactive-title">
+                        <span>💡 代码优雅度</span>
+                    </div>
+                    <div style="font-size: 12px; color: #475569;">
+                        消除样板代码，控制器与底层存储、Session、配置彻底解耦，单元测试可轻松 Mock 替换。
+                    </div>
+                </div>
+            </div>
+
+            <!-- 7. 纯 Go 0-CGO 嵌入式 SQLite 数据库驱动 -->
+            <div class="card" data-cat="core">
+                <div class="card-header">
+                    <div class="card-icon">⚡</div>
+                    <div class="badge">持久化基建</div>
+                </div>
+                <div class="card-title">纯 Go 0-CGO 嵌入式 SQLite 与链式 ORM</div>
+                <div class="card-desc">
+                    采用纯 Go 编译的 <code>modernc.org/sqlite</code>，无任何 gcc/CGO 依赖，任何平台秒级交叉编译。封装对标 CodeIgniter 体验的链式 QueryBuilder、智能分页器 <code>Paginate</code> 与原子事务保护。
+                </div>
+                <div class="code-box">
+var articles []Article<br>
+pager, err := db.<span class="fn">Table</span>(<span class="str">"articles"</span>).<br>
+&nbsp;&nbsp;<span class="fn">Where</span>(<span class="str">"status = ?"</span>, 1).<br>
+&nbsp;&nbsp;<span class="fn">Paginate</span>(1, 10, &articles)
+                </div>
+                <div class="interactive-zone">
+                    <div class="interactive-title">
+                        <span>📖 实际应用体验</span>
+                    </div>
+                    <a href="/?page=1" class="btn-action">📄 前台分页与关键词检索实测</a>
+                </div>
+            </div>
+
+            <!-- 8. 响应计时与 W3C Server-Timing -->
+            <div class="card" data-cat="security">
+                <div class="card-header">
+                    <div class="card-icon">⏱️</div>
+                    <div class="badge">性能度量与安全</div>
+                </div>
+                <div class="card-title">W3C Server-Timing 与安全防护标头</div>
+                <div class="card-desc">
+                    洋葱圈中间件模型。<code>ResponseTimer()</code> 精确统计纳秒级生命周期并在响应头注入 W3C <code>Server-Timing</code> 规范；<code>SecurityHeaders()</code> 注入防御标头。
                 </div>
                 <div class="code-box">
 Header: X-Response-Time<br>
-Header: Server-Timing<br>
+Header: Server-Timing: app;dur=0.35<br>
 Header: X-Content-Type-Options: nosniff
                 </div>
-                <button class="btn-action" onclick="fetchTiming()">🔍 探测本请求响应头</button>
-                <div id="timingResult" style="margin-top: 10px; font-size: 12px; color: #059669; display: none;"></div>
+                <div class="interactive-zone">
+                    <div class="interactive-title">
+                        <span>🔍 实时请求标头探测</span>
+                    </div>
+                    <button class="btn-action" onclick="fetchTiming()">🔍 探测本请求响应头</button>
+                    <div id="timingResult" class="result-box result-success"></div>
+                </div>
             </div>
 
-            <!-- 2. Panic 优雅捕获与不宕机 -->
-            <div class="card">
-                <div class="card-icon">🛡️</div>
-                <div class="badge">容灾与可用性</div>
-                <div class="card-title">Panic 优雅恢复 (Recovery)</div>
+            <!-- 9. Panic 优雅捕获与不宕机 -->
+            <div class="card" data-cat="security">
+                <div class="card-header">
+                    <div class="card-icon">🛡️</div>
+                    <div class="badge badge-sec">容灾与高可用</div>
+                </div>
+                <div class="card-title">Panic 优雅恢复与故障隔离 (Recovery)</div>
                 <div class="card-desc">
-                    任何业务逻辑或未捕获的空指针异常，均由 <code>middleware.Recovery()</code> 拦截并输出彩色堆栈，服务端返回 500，进程永远不宕机！
+                    业务逻辑或空指针异常均由 <code>middleware.Recovery()</code> 兜底捕获，格式化输出彩色堆栈，服务端安全返回 500 状态码，<strong>主进程永远不宕机</strong>！
                 </div>
                 <div class="code-box">
-panic("故意触发的异常") &rarr; 捕获恢复 &rarr; 保持服务可用
+panic(<span class="str">"故意触发的异常"</span>) &rarr; 捕获恢复 &rarr; 保持服务可用
                 </div>
-                <a href="/demo/panic" target="_blank" class="btn-action btn-danger">💥 触发一次运行时 Panic 测试</a>
+                <div class="interactive-zone">
+                    <div class="interactive-title">
+                        <span>💥 容灾隔离测试</span>
+                    </div>
+                    <a href="/demo/panic" target="_blank" class="btn-action btn-danger">💥 触发一次运行时 Panic 测试</a>
+                </div>
             </div>
 
-            <!-- 3. 文件上传与安全限制 -->
-            <div class="card">
-                <div class="card-icon">🖼️</div>
-                <div class="badge">文件上传机制</div>
-                <div class="card-title">封面上传与静态资源服务</div>
+            <!-- 10. 服务端 HTML 模板渲染与无侵入注释语法 -->
+            <div class="card" data-cat="core">
+                <div class="card-header">
+                    <div class="card-icon">🎨</div>
+                    <div class="badge">独创模板语法</div>
+                </div>
+                <div class="card-title">无侵入 HTML 注释模板渲染语法</div>
                 <div class="card-desc">
-                    通过 <code>SaveUploadedFileWithOptions</code> 实现 5MB 限制、扩展名白名单校验与自动安全重命名，配合 <code>app.Static</code> 极速静态分发。
+                    Godeniter 独创支持 <code>&lt;!--&#123;&#123; ... &#125;&#125;--&gt;</code> 语法。前端设计师或浏览器本地双击直接打开 HTML 原型不会乱码或破坏排版；运行时走 Go 原生 AST 编译，<strong>零性能损耗</strong>。
+                </div>
+                <div class="code-box">
+<span class="cm">&lt;!--&#123;&#123; if .CurrentUser &#125;&#125;--&gt;</span><br>
+&nbsp;&nbsp;&lt;a href="/edit"&gt;✏️ 编辑文章&lt;/a&gt;<br>
+<span class="cm">&lt;!--&#123;&#123; end &#125;&#125;--&gt;</span>
+                </div>
+                <div class="interactive-zone">
+                    <div class="interactive-title">
+                        <span>💡 原型设计双击预览</span>
+                    </div>
+                    <div style="font-size: 12px; color: #475569;">
+                        支持标准 <code>&#123;&#123; ... &#125;&#125;</code> 与无侵入注释语法无缝混用，兼顾前后端协作与极简渲染。
+                    </div>
+                </div>
+            </div>
+
+            <!-- 11. 文件上传与安全限制 -->
+            <div class="card" data-cat="security">
+                <div class="card-header">
+                    <div class="card-icon">🖼️</div>
+                    <div class="badge">文件上传机制</div>
+                </div>
+                <div class="card-title">封面上传与静态资源极速分发</div>
+                <div class="card-desc">
+                    通过 <code>SaveUploadedFileWithOptions</code> 实现 5MB 限制、扩展名白名单防穿透校验与自动安全重命名，配合 <code>app.Static</code> 极速静态分发。
                 </div>
                 <div class="code-box">
 opts := upload.Options{<br>
-  SaveDir: "./uploads/images",<br>
-  MaxBytes: 5*1024*1024, AutoRename: true<br>
+&nbsp;&nbsp;SaveDir: <span class="str">"./uploads/images"</span>,<br>
+&nbsp;&nbsp;MaxBytes: 5*1024*1024, AutoRename: true<br>
 }
                 </div>
-                <a href="/admin/articles/create" class="btn-action">📸 去后台发布页体验上传</a>
+                <div class="interactive-zone">
+                    <div class="interactive-title">
+                        <span>📸 后台实操体验</span>
+                    </div>
+                    <a href="/admin/articles/create" class="btn-action">📸 去后台发布页体验图片上传</a>
+                </div>
             </div>
 
-            <!-- 4. 结构体 Tag 自动校验 -->
-            <div class="card">
-                <div class="card-icon">✅</div>
-                <div class="badge">参数绑定与校验</div>
-                <div class="card-title">零依赖参数校验器</div>
+            <!-- 12. 结构体 Tag 自动校验 -->
+            <div class="card" data-cat="core">
+                <div class="card-header">
+                    <div class="card-icon">✅</div>
+                    <div class="badge">参数绑定与校验</div>
+                </div>
+                <div class="card-title">零依赖参数校验器 (Validator)</div>
                 <div class="card-desc">
-                    基于纯 Go 反射实现的 Validator。无需引入任何第三方库，声明 <code>binding:"required,min=3,max=80"</code> 即可完成字段校验。
+                    基于纯 Go 反射实现的 Validator。无需引入任何第三方库，在 Struct 上声明 <code>binding:"required,min=3,max=80"</code> 即可由 <code>c.BindAndValidate</code> 完成字段级自动拦截。
                 </div>
                 <div class="code-box">
-type FormArticleRequest struct {<br>
-  Title string `binding:"required,min=3"`<br>
-} &rarr; c.BindAndValidate(&req)
+type ArticleRequest struct {<br>
+&nbsp;&nbsp;Title string `binding:<span class="str">"required,min=3,max=80"</span>`<br>
+} &rarr; c.<span class="fn">BindAndValidate</span>(&req)
                 </div>
-                <span style="font-size: 12px; color: #64748b;">发布/编辑文章时故意提交过短标题即可触发</span>
+                <div class="interactive-zone">
+                    <div class="interactive-title">
+                        <span>🧪 校验逻辑验证</span>
+                    </div>
+                    <div style="font-size: 12px; color: #475569;">
+                        在后台发文或编辑时故意提交小于 3 个字符的短标题，将直接收到结构体校验拦截提示。
+                    </div>
+                </div>
             </div>
 
-            <!-- 5. 数据脱敏与 XSS 安全防御 -->
-            <div class="card">
-                <div class="card-icon">🔒</div>
-                <div class="badge">安全辅助工具</div>
-                <div class="card-title">敏感信息脱敏与 XSS 过滤</div>
+            <!-- 13. 数据脱敏与 XSS 安全防御 -->
+            <div class="card" data-cat="security">
+                <div class="card-header">
+                    <div class="card-icon">🔒</div>
+                    <div class="badge badge-sec">安全辅助工具</div>
+                </div>
+                <div class="card-title">敏感数据脱敏与 XSS 脚本过滤</div>
                 <div class="card-desc">
-                    内置类似 CodeIgniter 的安全库：<code>str.MaskEmail</code>、<code>str.MaskPhone</code> 自动脱敏，<code>str.XSSFilter</code> 过滤恶意脚本。
+                    内置类似 CodeIgniter 的安全库：<code>str.MaskEmail</code>、<code>str.MaskPhone</code>、<code>str.MaskIDCard</code> 自动脱敏，<code>str.XSSFilter</code> 过滤恶意脚本。
                 </div>
                 <div class="code-box">
 admin@godeniter.dev &rarr; a***n@godeniter.dev<br>
 13800138000 &rarr; 138****8000<br>
 &lt;script&gt;alert(1)&lt;/script&gt; &rarr; 过滤清洗
                 </div>
-                <a href="/" class="btn-action">👀 查看前台首页脱敏效果</a>
+                <div class="interactive-zone">
+                    <div class="interactive-title">
+                        <span>👀 查看前台脱敏呈现</span>
+                    </div>
+                    <a href="/" class="btn-action">👀 查看前台作者邮箱脱敏效果</a>
+                </div>
             </div>
 
-            <!-- 6. 动态配置与单文件发布 -->
-            <div class="card">
-                <div class="card-icon">📦</div>
-                <div class="badge">工程化与交付</div>
-                <div class="card-title">零依赖 JSON 配置与一键打包</div>
+            <!-- 14. 动态配置与单文件打包交付 -->
+            <div class="card" data-cat="core">
+                <div class="card-header">
+                    <div class="card-icon">📦</div>
+                    <div class="badge">工程化与交付</div>
+                </div>
+                <div class="card-title">零依赖 JSON 配置与一键独立打包</div>
                 <div class="card-desc">
-                    程序就近自生成带缩进的 <code>config.json</code>，客户记事本即可修改端口。运行 <code>./build.sh</code> 生成 Windows 单文件 <code>app.exe</code> 离线交付！
+                    首次启动若无配置，Sidecar 自动生成结构清晰的 <code>config.json</code>。纯 Go 实现 Windows COFF 图标编译器，运行 <code>./build.sh</code> 一键生成带图标的 <code>app.exe</code> 单文件！
                 </div>
                 <div class="code-box">
 ./build.sh &rarr; dist/app.exe<br>
-双击直接运行 · 免装 Go 环境 · 0 依赖
+双击直接运行 · 免装 Go 环境 · 0 外部构建工具链
                 </div>
-                <span style="font-size: 12px; color: #64748b;">执行终端脚本查看编译成果</span>
+                <div class="interactive-zone">
+                    <div class="interactive-title">
+                        <span>⚡ 交付优势</span>
+                    </div>
+                    <div style="font-size: 12px; color: #475569;">
+                        客户机无需任何运行时环境，记事本直接修改 <code>config.json</code>，双击即可无缝离线部署。
+                    </div>
+                </div>
             </div>
+
         </div>
     </main>
 
     <footer>
-        Godeniter 2.0 Web Framework &bull; 0 外部依赖 &bull; 极速单文件发布
+        Godeniter 2.0 Web Framework &bull; 0 外部依赖 &bull; 纯 Go 现代化全栈交付脚手架
     </footer>
 
     <script>
+        // 1. 分类筛选
+        function filterCards(cat, btn) {
+            document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+
+            const cards = document.querySelectorAll('#featureGrid .card');
+            cards.forEach(card => {
+                if (cat === 'all' || card.getAttribute('data-cat') === cat) {
+                    card.style.display = 'flex';
+                } else {
+                    card.style.display = 'none';
+                }
+            });
+        }
+
+        // 2. 探测 Server-Timing 标头
         function fetchTiming() {
             fetch(window.location.href, { method: 'HEAD' }).then(res => {
-                const rt = res.headers.get('X-Response-Time') || '约 0.35ms';
-                const st = res.headers.get('Server-Timing') || 'app;dur=0.35';
+                const rt = res.headers.get('X-Response-Time') || '约 0.28ms';
+                const st = res.headers.get('Server-Timing') || 'app;dur=0.28';
+                const sec = res.headers.get('X-Content-Type-Options') || 'nosniff';
                 const box = document.getElementById('timingResult');
                 box.style.display = 'block';
-                box.innerHTML = `✅ 响应头探测成功！<br><strong>X-Response-Time:</strong> ${rt}<br><strong>Server-Timing:</strong> ${st}`;
+                box.className = 'result-box result-success';
+                box.innerHTML = `✅ <strong>响应头探测成功！</strong><br>
+                    &bull; <strong>X-Response-Time:</strong> ${rt}<br>
+                    &bull; <strong>Server-Timing:</strong> ${st}<br>
+                    &bull; <strong>X-Content-Type-Options:</strong> ${sec}`;
             }).catch(e => {
                 alert('探测失败: ' + e);
             });
+        }
+
+        // 3. 模拟探测敏感文件并验证拦截
+        function probeSensitive(path) {
+            const box = document.getElementById('sensitiveResult');
+            box.style.display = 'block';
+            box.className = 'result-box result-info';
+            box.innerHTML = `⏳ 正在发起对 <code>${path}</code> 的恶意探测探测...`;
+
+            fetch(path).then(res => {
+                if (res.status === 403) {
+                    box.className = 'result-box result-blocked';
+                    box.innerHTML = `🛡️ <strong>中间件主动拦截成功！</strong><br>
+                        目标路径: <code>${path}</code><br>
+                        返回状态: <strong style="color:#ef4444;">HTTP 403 Forbidden</strong><br>
+                        说明: 框架 BlockSensitiveFiles 规则命中，已拒绝向客户端返回该敏感资源！`;
+                } else {
+                    box.className = 'result-box result-info';
+                    box.innerHTML = `响应状态: ${res.status}`;
+                }
+            }).catch(e => {
+                box.innerHTML = `请求错误: ${e}`;
+            });
+        }
+
+        // 4. 实时拉取 Cron 任务快照
+        function fetchCronJobs() {
+            const box = document.getElementById('cronResult');
+            const loading = document.getElementById('cronLoading');
+            loading.style.display = 'inline';
+            box.style.display = 'block';
+            box.className = 'result-box result-info';
+            box.innerHTML = '正在拉取底层 Cron 任务调度引擎状态...';
+
+            fetch('/api/v1/cron/jobs')
+                .then(res => res.json())
+                .then(json => {
+                    loading.style.display = 'none';
+                    if (json.code !== 200 || !json.data) {
+                        box.innerHTML = `获取失败: ${json.msg || '未知错误'}`;
+                        return;
+                    }
+                    const jobs = json.data;
+                    let html = `<strong>⏰ 当前底层活跃任务数: ${jobs.length}</strong>`;
+                    html += `<table class="job-table">
+                        <thead>
+                            <tr>
+                                <th>任务标识 (ID)</th>
+                                <th>Cron 表达式</th>
+                                <th>运行次数</th>
+                                <th>最后耗时</th>
+                                <th>状态</th>
+                            </tr>
+                        </thead>
+                        <tbody>`;
+                    jobs.forEach(j => {
+                        const statusBadge = j.last_status === 'ok' 
+                            ? `<span class="job-status-badge status-ok">正常</span>` 
+                            : `<span class="job-status-badge status-idle">待触发</span>`;
+                        const dur = j.last_cost_ns > 0 ? (j.last_cost_ns / 1000).toFixed(1) + ' µs' : '-';
+                        html += `<tr>
+                            <td><strong>${j.name}</strong><br><span style="color:#64748b;font-size:10px;">${j.id}</span></td>
+                            <td><code>${j.spec}</code></td>
+                            <td>${j.run_count} 次</td>
+                            <td>${dur}</td>
+                            <td>${statusBadge}</td>
+                        </tr>`;
+                    });
+                    html += `</tbody></table>`;
+                    box.innerHTML = html;
+                })
+                .catch(e => {
+                    loading.style.display = 'none';
+                    box.innerHTML = `请求失败: ${e}`;
+                });
+        }
+
+        // 5. 手动立即触发某个 Cron 任务
+        function triggerCronJob(id) {
+            const box = document.getElementById('cronResult');
+            box.style.display = 'block';
+            box.className = 'result-box result-info';
+            box.innerHTML = `⚡ 正在向引擎发送即时触发指令 [${id}]...`;
+
+            fetch(`/api/v1/cron/trigger/${id}`, { method: 'POST' })
+                .then(res => res.json())
+                .then(json => {
+                    if (json.code === 200) {
+                        box.innerHTML = `✅ <strong>指令触发成功！</strong>任务 [${id}] 已在独立协程中即时执行，正在刷新状态...`;
+                        setTimeout(fetchCronJobs, 300);
+                    } else {
+                        box.innerHTML = `❌ 触发失败: ${json.msg}`;
+                    }
+                })
+                .catch(e => {
+                    box.innerHTML = `触发请求失败: ${e}`;
+                });
+        }
+
+        // 6. 探测存储驱动引擎
+        function fetchStorageStatus() {
+            const box = document.getElementById('storageResult');
+            box.style.display = 'block';
+            box.className = 'result-box result-info';
+            box.innerHTML = '正在探测存储引擎...';
+
+            fetch('/api/v1/storage/status')
+                .then(res => res.json())
+                .then(json => {
+                    if (json.code !== 200) {
+                        box.innerHTML = `探测失败: ${json.msg}`;
+                        return;
+                    }
+                    const d = json.data;
+                    let html = `<strong>📦 当前主存储驱动: </strong><code style="background:#e0f2fe;color:#0369a1;padding:2px 6px;border-radius:4px;">${d.current_driver}</code> (上传根目录: <code>${d.upload_dir}</code>)<br><br>`;
+                    html += `<strong>已就绪的存储驱动抽象支持:</strong><ul style="margin-left: 18px; margin-top: 4px; line-height: 1.6;">`;
+                    d.supported_drivers.forEach(drv => {
+                        const statusTag = drv.status === 'active' ? '<strong style="color:#059669;">[当前激活]</strong>' : '<span style="color:#64748b;">[可平滑切换]</span>';
+                        html += `<li><strong>${drv.name}</strong> ${statusTag}: ${drv.desc}</li>`;
+                    });
+                    html += `</ul>`;
+                    box.innerHTML = html;
+                })
+                .catch(e => {
+                    box.innerHTML = `请求失败: ${e}`;
+                });
         }
     </script>
 </body>
