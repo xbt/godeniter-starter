@@ -184,6 +184,30 @@ godeniter-starter/
 └── go.mod                  # 模块声明 (引入 godeniter)
 ```
 
+---
+
+## 🌟 底层能力活字典与特性速查 (Showcase & Best Practices)
+
+作为官方标准起步工程，本 Starter 是探索 `godeniter` 核心引擎所有特性的最佳窗口：
+
+| 特性分类 | 演示模块 / 源码位置 | 特性说明 |
+| :--- | :--- | :--- |
+| **纯 Go 多存储驱动** | `app/services/storage.go` | 基于纯标准库（0 外部 SDK）抽象的 `storage.Driver`。开箱支持本地磁盘，附带详尽示例演示如何切换至 **WebDAV**（坚果云/Nextcloud）或 **AWS SigV4 规范的 S3 / Cloudflare R2 / 阿里云 OSS / MinIO**。 |
+| **Web 安全防护标头** | `app/middleware/security.go` | 原生接入 `middleware.Security()`，全自动注入 `nosniff`、`SAMEORIGIN`、`XSS-Protection`、`Referrer-Policy` 等行业基线安全头。 |
+| **敏感资源探测防御** | `app/middleware/security.go` | 原生接入 `middleware.BlockSensitive()`，自动探测拦截黑客针对 `.db`、`.sqlite`、`config.json`、`.env`、`.git` 的未授权嗅探，直接 403 阻断并记入审计日志。 |
+| **Server-Timing 追踪** | `app/middleware/timer.go` | 原生接入 `middleware.ServerTiming()`，为所有 HTTP 响应注入 `X-Response-Time` 和 W3C 标准 `Server-Timing` 标头，方便前端分析后端耗时。 |
+| **API Key 鉴权中间件** | `app/middleware/keyauth.go` | 原生接入 `middleware.KeyAuth()`，多通道自动提取 `Bearer Token`、`X-API-Key` 或 Query 参数并执行高效鉴权。 |
+| **SQLite 随机库名持久化** | `config/app.go` | 自动识别 `{random}` 占位符或默认库名，生成专属不可预测随机名并自动写回 `config.json` 固化，防止针对固定库名的恶意猜测。 |
+| **单文件 Favicon 内嵌** | `main.go` | 纯标准库 0 外部工具内嵌 `app.ico` 并挂载 `/favicon.ico` 路由，消灭浏览器控制台 404 图标告警。 |
+| **跨平台控制台自动隐身** | `main.go` | Windows 下桌面双击无黑框闪烁，自动最小化至托盘并提供右键控制菜单；CLI 命令行带参仍可正常输出彩色日志。 |
+
+---
+
+## 🚀 进阶与实战延伸案例：godetype
+
+如果您想了解如何基于本 Starter 脚手架延伸构建高复杂度的真实生产级业务系统，请参考官方旗舰案例：
+* **[godetype](https://github.com/xbt/godetype)**：基于 `godeniter-starter` 骨架孵化衍生的 Typecho 极客博客系统（100% 纯 Go 0-CGO 驱动、深度兼容 Typecho 官方数据表、Fifty shades of Tux 经典调色板）。
+
 
 ---
 

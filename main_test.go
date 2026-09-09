@@ -9,6 +9,7 @@ import (
 	"strings"
 	"testing"
 
+	"godeniter-starter/app/services"
 	"godeniter-starter/config"
 )
 
@@ -362,3 +363,45 @@ func TestAdminAuthAndCRUD(t *testing.T) {
 		t.Fatalf("删除后访问文章应返回 404，实际: %d", wDetail3.Code)
 	}
 }
+
+// TestBlockSensitiveFilesProbe 验证敏感系统文件与数据库探测拦截中间件 (403 阻断)
+func TestBlockSensitiveFilesProbe(t *testing.T) {
+	cfg := config.DefaultConfig()
+	app := setupApp(cfg)
+
+	// 探测 SQLite 库或 config.json 预期直接 403 Forbidden
+	probes := []string{"/data/app.db", "/config.json", "/.env", "/.git/config"}
+	for _, p := range probes {
+		w := httptest.NewRecorder()
+		req, _ := http.NewRequest("GET", p, nil)
+		app.ServeHTTP(w, req)
+		if w.Code != http.StatusForbidden {
+			t.Errorf("探测敏感路径 %s 预期返回 403 Forbidden，实际: %d", p, w.Code)
+		}
+	}
+}
+
+// TestStarterStorageDriver 验证演示的多存储驱动接口与本地驱动基本功能
+func TestStarterStorageDriver(t *testing.T) {
+	tmpDir := t.TempDir()
+	driver := services.NewDefaultStorageDriver(tmpDir)
+
+	if driver.Name() != "local" {
+		t.Fatalf("预期默认存储驱动为 'local', 实际: %s", driver.Name())
+	}
+
+	testData := []byte("fake starter image data")
+	fileURL, err := driver.Save("test_sample.png", bytes.NewReader(testData), int64(len(testData)), "image/png")
+	if err != nil {
+		t.Fatalf("保存文件失败: %v", err)
+	}
+
+	if !strings.HasPrefix(fileURL, "/uploads/images/") {
+		t.Fatalf("返回 URL 格式异常: %s", fileURL)
+	}
+
+	if err := driver.Delete("test_sample.png"); err != nil {
+		t.Fatalf("删除文件失败: %v", err)
+	}
+}
+

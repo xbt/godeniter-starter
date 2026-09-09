@@ -40,6 +40,7 @@ func setupApp(cfg *config.Config) *godeniter.Engine {
 
 	// 挂载全局中间件流水线 (展示洋葱圈模型、耗时追踪与安全防护标头)
 	app.Use(appMiddleware.ResponseTimer())
+	app.Use(appMiddleware.BlockSensitiveFiles())
 	app.Use(appMiddleware.SecurityHeaders())
 	app.Use(middleware.CORS())
 	store := session.NewCookieStore(cfg.App.SessionKey)
