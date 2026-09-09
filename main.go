@@ -80,6 +80,14 @@ func setupApp(cfg *config.Config) *godeniter.Engine {
 	adminCtrl := &controllers.AdminController{}
 	articleAPICtrl := &controllers.ArticleAPIController{}
 
+	// 7. 注册计划任务调度示例 (展示 godeniter 原生内置秒级与分级 Cron 引擎能力)
+	_, _ = app.Schedule("heartbeat", "系统运行时心跳巡检", "*/15 * * * * *", func() error {
+		return nil
+	})
+	_, _ = app.Schedule("cleanup", "临时缓存模拟清理", "@hourly", func() error {
+		return nil
+	})
+
 	// 8. 注册 Web 页面路由 (服务端渲染 SSR)
 	app.Get("/", homeCtrl.Index)
 	app.Get("/features", homeCtrl.Features)
@@ -109,6 +117,9 @@ func setupApp(cfg *config.Config) *godeniter.Engine {
 		api.Post("/articles", articleAPICtrl.Create)
 		api.Delete("/articles/:id", articleAPICtrl.Delete)
 		api.Post("/upload", articleAPICtrl.Upload)
+		api.Get("/cron/jobs", func(c *godeniter.Context) {
+			c.Success(app.Cron.Jobs())
+		})
 	}
 
 	// 11. 自定义 404 未命中页面

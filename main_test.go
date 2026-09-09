@@ -405,3 +405,40 @@ func TestStarterStorageDriver(t *testing.T) {
 	}
 }
 
+// TestStarterCronScheduler 验证 starter 中内置 Cron 计划任务的注册与状态查询接口
+func TestStarterCronScheduler(t *testing.T) {
+	cfg := config.DefaultConfig()
+	app := setupApp(cfg)
+
+	// 1. 验证 Cron 实例中已注册 heartbeat 与 cleanup
+	jobs := app.Cron.Jobs()
+	if len(jobs) < 2 {
+		t.Fatalf("预期至少注册 2 个计划任务，实际: %d", len(jobs))
+	}
+
+	foundHeartbeat := false
+	for _, j := range jobs {
+		if j.ID == "heartbeat" {
+			foundHeartbeat = true
+			if j.Spec != "*/15 * * * * *" {
+				t.Errorf("heartbeat 任务规格不匹配: %s", j.Spec)
+			}
+		}
+	}
+	if !foundHeartbeat {
+		t.Errorf("未找到预期的 heartbeat 任务")
+	}
+
+	// 2. 通过 REST API 接口获取任务快照
+	w := httptest.NewRecorder()
+	req, _ := http.NewRequest("GET", "/api/v1/cron/jobs", nil)
+	app.ServeHTTP(w, req)
+
+	if w.Code != http.StatusOK {
+		t.Fatalf("访问 /api/v1/cron/jobs 应返回 200，实际: %d", w.Code)
+	}
+	if !strings.Contains(w.Body.String(), "heartbeat") {
+		t.Errorf("API 未返回 heartbeat 任务")
+	}
+}
+
