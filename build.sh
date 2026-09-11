@@ -71,7 +71,7 @@ if [[ "$OSTYPE" == "darwin"* ]]; then
     <key>CFBundlePackageType</key>
     <string>APPL</string>
     <key>CFBundleShortVersionString</key>
-    <string>1.0.5</string>
+    <string>1.0.0</string>
     <key>LSUIElement</key>
     <false/>
 </dict>
