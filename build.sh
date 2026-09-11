@@ -32,6 +32,19 @@ if [[ "$OSTYPE" == "darwin"* ]]; then
     mkdir -p "${APP_BUNDLE}/Contents/Resources"
     cp "${OUTPUT_DIR}/app" "${APP_BUNDLE}/Contents/MacOS/app"
     chmod +x "${APP_BUNDLE}/Contents/MacOS/app"
+
+    # 若有应用图标，自动生成 macOS 原生 .icns 图标资源
+    if [ -f "app.ico" ]; then
+        sips -s format png app.ico --out "${APP_BUNDLE}/Contents/Resources/AppIcon.png" >/dev/null 2>&1 || true
+        mkdir -p /tmp/AppIcon.iconset
+        sips -z 128 128 "${APP_BUNDLE}/Contents/Resources/AppIcon.png" --out /tmp/AppIcon.iconset/icon_128x128.png >/dev/null 2>&1 || true
+        sips -z 256 256 "${APP_BUNDLE}/Contents/Resources/AppIcon.png" --out /tmp/AppIcon.iconset/icon_128x128@2x.png >/dev/null 2>&1 || true
+        sips -z 256 256 "${APP_BUNDLE}/Contents/Resources/AppIcon.png" --out /tmp/AppIcon.iconset/icon_256x256.png >/dev/null 2>&1 || true
+        sips -z 512 512 "${APP_BUNDLE}/Contents/Resources/AppIcon.png" --out /tmp/AppIcon.iconset/icon_256x256@2x.png >/dev/null 2>&1 || true
+        iconutil -c icns /tmp/AppIcon.iconset -o "${APP_BUNDLE}/Contents/Resources/AppIcon.icns" >/dev/null 2>&1 || true
+        rm -rf /tmp/AppIcon.iconset "${APP_BUNDLE}/Contents/Resources/AppIcon.png"
+    fi
+
     cat << 'EOF' > "${APP_BUNDLE}/Contents/Info.plist"
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
@@ -39,6 +52,8 @@ if [[ "$OSTYPE" == "darwin"* ]]; then
 <dict>
     <key>CFBundleExecutable</key>
     <string>app</string>
+    <key>CFBundleIconFile</key>
+    <string>AppIcon</string>
     <key>CFBundleIdentifier</key>
     <string>com.godeniter.starter</string>
     <key>CFBundleName</key>
@@ -46,9 +61,9 @@ if [[ "$OSTYPE" == "darwin"* ]]; then
     <key>CFBundlePackageType</key>
     <string>APPL</string>
     <key>CFBundleShortVersionString</key>
-    <string>1.0.2</string>
+    <string>1.0.3</string>
     <key>LSUIElement</key>
-    <true/>
+    <false/>
 </dict>
 </plist>
 EOF

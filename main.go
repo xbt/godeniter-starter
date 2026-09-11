@@ -9,6 +9,7 @@ import (
 	"net"
 	"net/http"
 	"os"
+	"path/filepath"
 	"runtime"
 	"strconv"
 	"strings"
@@ -156,7 +157,15 @@ func setupApp(cfg *config.Config) *godeniter.Engine {
 }
 
 func main() {
-	// 0. 若当前为 Windows GUI 模式且用户从现有终端 (CMD/PowerShell) 启动，自动挂载父级控制台输入输出
+	// 0. 若当前通过 macOS .app Bundle 启动，自动将工作目录修正为 .app 所在同级目录
+	if exe, err := os.Executable(); err == nil {
+		if strings.Contains(exe, ".app/Contents/MacOS") {
+			appDir := filepath.Dir(filepath.Dir(filepath.Dir(filepath.Dir(exe))))
+			_ = os.Chdir(appDir)
+		}
+	}
+
+	// 若当前为 Windows GUI 模式且用户从现有终端 (CMD/PowerShell) 启动，自动挂载父级控制台输入输出
 	tray.AttachConsole()
 
 	// 1. 动态加载应用配置 (优先读取本地 config.json，不存在则自动生成；支持环境变量覆盖)
@@ -200,7 +209,7 @@ func main() {
 		fmt.Printf(">> [TRAY] 本地后台访问网址: %s\n", webURL)
 		fmt.Println(">> [TRAY] 提示: 顶部菜单栏/系统托盘已常驻图标与管理菜单，随时按 Ctrl+C 或点击菜单项安全退出")
 
-		// 1. 同步预检并监听网络端口，若遇端口冲突立即友好提示杀进程方案并退出
+		// 1. 同步预检并监听网络端口，若遇端口冲突立即友好提示杀进程方案并退出 (不弹窗，直接输出控制台)
 		ln, err := net.Listen("tcp", cfg.App.Port)
 		if err != nil {
 			portNum := strings.TrimPrefix(cfg.App.Port, ":")
@@ -217,11 +226,6 @@ func main() {
 			fmt.Printf("   👉 或者修改 config.json 中的 \"port\": \":8081\" 更换为其它未占用端口\n")
 			fmt.Println(strings.Repeat("=", 78) + "\n")
 
-			// 若在桌面双击运行 (无终端黑框模式)，弹出系统原生警告框
-			tray.ShowAlert("端口被占用 - Godeniter", fmt.Sprintf(
-				"端口 %s 已被占用，启动失败！\n\n如需一键释放端口，请在终端执行：\nkill -9 $(lsof -ti :%s -sTCP:LISTEN)\n\n或修改 config.json 更改端口。",
-				cfg.App.Port, portNum,
-			))
 			os.Exit(1)
 		}
 
@@ -242,13 +246,7 @@ func main() {
 			}
 		}()
 
-		// 4. 自动唤起系统默认浏览器打开后台网址 (提供“双击有反应”的即时正向反馈)
-		go func() {
-			time.Sleep(150 * time.Millisecond)
-			_ = tray.OpenURL(webURL)
-		}()
-
-		// 5. 主线程运行跨平台桌面托盘与状态栏菜单 (阻塞至用户退出)
+		// 4. 主线程运行跨平台桌面托盘与状态栏菜单 (阻塞至用户退出)
 		_ = tray.Run(tray.Options{
 			Title:       "Godeniter",
 			Tooltip:     fmt.Sprintf("%s (%s)", cfg.App.Name, cfg.App.Port),
