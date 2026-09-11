@@ -256,20 +256,6 @@ func main() {
 			Version:     "v1.0.5",
 			Port:        cfg.App.Port,
 			HideConsole: true,
-			Menus: []tray.MenuItem{
-				{
-					Title: "💾 打开数据目录",
-					OnClick: func() {
-						_ = tray.OpenFolder("./data")
-					},
-				},
-				{
-					Title: "📂 打开上传目录",
-					OnClick: func() {
-						_ = tray.OpenFolder(cfg.Upload.Dir)
-					},
-				},
-			},
 			OnExit: func() {
 				fmt.Println("\n>> [TRAY] 收到退出指令，正在安全平滑关闭 Web 服务...")
 				ctx, cancel := context.WithTimeout(context.Background(), 3*time.Second)
