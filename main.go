@@ -205,9 +205,6 @@ func main() {
 
 	if isTrayMode {
 		webURL := "http://127.0.0.1" + cfg.App.Port
-		fmt.Printf(">> [TRAY] 正在以桌面系统托盘模式启动 [%s]...\n", cfg.App.Name)
-		fmt.Printf(">> [TRAY] 本地后台访问网址: %s\n", webURL)
-		fmt.Println(">> [TRAY] 提示: 顶部菜单栏/系统托盘已常驻图标与管理菜单，随时按 Ctrl+C 或点击菜单项安全退出")
 
 		// 1. 同步预检并监听网络端口，若遇端口冲突立即友好提示杀进程方案并退出 (不弹窗，直接输出控制台)
 		ln, err := net.Listen("tcp", cfg.App.Port)
@@ -229,6 +226,9 @@ func main() {
 			os.Exit(1)
 		}
 
+		// 打印经典 ASCII 艺术字横幅与本地/局域网访问地址
+		godeniter.PrintBanner(cfg.App.Port)
+
 		// 2. 将自身 PID 写入文件，方便与 daemon stop / start 统一管理
 		pid := os.Getpid()
 		_ = os.WriteFile(cfg.App.PIDFile, []byte(strconv.Itoa(pid)), 0644)
@@ -246,16 +246,30 @@ func main() {
 			}
 		}()
 
-		// 4. 主线程运行跨平台桌面托盘与状态栏菜单 (阻塞至用户退出)
+		// 4. 主线程运行跨平台桌面托盘、状态栏与 Dock 菜单 (阻塞至用户退出)
 		_ = tray.Run(tray.Options{
 			Title:       "Godeniter",
 			Tooltip:     fmt.Sprintf("%s (%s)", cfg.App.Name, cfg.App.Port),
 			IconBytes:   appIcoBytes,
 			URL:         webURL,
 			AppDir:      tray.GetExecutableDir(),
-			Version:     "v1.0.1",
+			Version:     "v1.0.5",
 			Port:        cfg.App.Port,
 			HideConsole: true,
+			Menus: []tray.MenuItem{
+				{
+					Title: "💾 打开数据目录",
+					OnClick: func() {
+						_ = tray.OpenFolder("./data")
+					},
+				},
+				{
+					Title: "📂 打开上传目录",
+					OnClick: func() {
+						_ = tray.OpenFolder(cfg.Upload.Dir)
+					},
+				},
+			},
 			OnExit: func() {
 				fmt.Println("\n>> [TRAY] 收到退出指令，正在安全平滑关闭 Web 服务...")
 				ctx, cancel := context.WithTimeout(context.Background(), 3*time.Second)
