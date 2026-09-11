@@ -154,6 +154,9 @@ func setupApp(cfg *config.Config) *godeniter.Engine {
 }
 
 func main() {
+	// 0. 若当前为 Windows GUI 模式且用户从现有终端 (CMD/PowerShell) 启动，自动挂载父级控制台输入输出
+	tray.AttachConsole()
+
 	// 1. 动态加载应用配置 (优先读取本地 config.json，不存在则自动生成；支持环境变量覆盖)
 	cfg := config.LoadConfig()
 

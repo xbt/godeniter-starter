@@ -280,12 +280,10 @@ app.Schedule("cleanup", "临时缓存模拟清理", "@hourly", func() error {
 build.bat      # Windows
 ```
 
-生成的单文件无需安装任何环境，直接拷贝给客户，**统一且功能完备**：
-* `dist/app_tray.exe`：**Windows 纯静默桌面托盘客户端**
-  - 基于 Windows GUI 子系统构建，双击直接常驻屏幕右下角任务栏托盘，**100% 彻底无黑框、无闪烁**，右键唤出完整管理菜单；
+生成的单文件无需安装任何环境，直接拷贝给客户，**单一二进制即可覆盖全部桌面与服务端场景**：
 * `dist/app.exe`：**Windows 统一全能二进制**
-  - 在 CMD / PowerShell 中：支持 `run/console` 调试与 `start/status/stop/restart` 守护进程管理；
-  - 桌面双击直接运行：自动隐藏控制台黑框进入右下角托盘；
+  - **桌面双击**：100% 纯静默运行，**彻底无任何控制台黑框闪现**，秒级直达屏幕右下角托盘并弹出就绪提示，右键展开管理菜单；
+  - **终端运行**：在 CMD / PowerShell 中支持 `run/console` 实时调试日志，以及 `start/status/stop/restart` 守护进程运维指令（自动 Attach 控制台输出）；
 * `dist/app`：**macOS / Linux 统一全能二进制**（支持 CLI 运维与顶部状态栏托盘）。
 
 ---

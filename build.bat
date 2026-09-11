@@ -10,18 +10,20 @@ if exist app.ico (
     go run github.com/xbt/godeniter/cmd/rsrc -auto
 )
 
-echo ^>^> 正在编译 Windows 统一全能程序 (dist\app.exe)...
-go build -ldflags="-s -w" -o dist\app.exe .
+echo ^>^> 正在编译 Windows 统一全能程序 (dist\app.exe，桌面双击无黑框 + 终端支持完整CLI)...
+go build -ldflags="-s -w -H=windowsgui" -o dist\app.exe .
 
-echo ^>^> 正在编译 Windows 纯静默托盘客户端 (dist\app_tray.exe，彻底无黑框)...
-go build -ldflags="-s -w -H=windowsgui" -o dist\app_tray.exe .
+if exist dist\app_tray.exe del dist\app_tray.exe
 
 if %ERRORLEVEL% equ 0 (
     echo.
     echo ==========================================================
-    echo 构建成功！生成产物说明：
-    echo   - dist\app_tray.exe : 纯桌面托盘客户端（双击直接进入右下角托盘，彻底无黑框）
-    echo   - dist\app.exe      : 统一全能二进制（双击进入托盘自动隐藏黑框；终端支持 run/start/stop 命令）
+    echo 构建成功！生成单一全能可执行程序：
+    echo   - dist\app.exe
+    echo.
+    echo 特性说明：
+    echo   1. 桌面双击：100%% 彻底无黑框、无闪现，直接静默直达屏幕右下角托盘！
+    echo   2. 命令行使用：终端中支持 run/console/start/stop/status 等全部指令输出！
     echo ==========================================================
 ) else (
     echo Build failed with error %ERRORLEVEL%
