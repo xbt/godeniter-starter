@@ -6,9 +6,11 @@ import (
 	"fmt"
 	"html/template"
 	"io/fs"
+	"net"
 	"net/http"
 	"os"
 	"runtime"
+	"strconv"
 	"strings"
 	"time"
 
@@ -198,18 +200,55 @@ func main() {
 		fmt.Printf(">> [TRAY] 本地后台访问网址: %s\n", webURL)
 		fmt.Println(">> [TRAY] 提示: 顶部菜单栏/系统托盘已常驻图标与管理菜单，随时按 Ctrl+C 或点击菜单项安全退出")
 
-		// 异步协程启动 Web 服务
+		// 1. 同步预检并监听网络端口，若遇端口冲突立即友好提示杀进程方案并退出
+		ln, err := net.Listen("tcp", cfg.App.Port)
+		if err != nil {
+			portNum := strings.TrimPrefix(cfg.App.Port, ":")
+			fmt.Println("\n" + strings.Repeat("=", 78))
+			fmt.Printf("❌ 【端口被占用】服务启动失败: 端口 %s 已被占用！\n", cfg.App.Port)
+			fmt.Printf(">> 详细底层错误: %v\n", err)
+			fmt.Println(">> 💡 解决方案 (一键释放端口并杀掉冲突进程):")
+			if runtime.GOOS == "windows" {
+				fmt.Printf("   👉 Windows CMD 终端执行:        for /f \"tokens=5\" %%a in ('netstat -aon ^| findstr :%s') do taskkill /f /pid %%a\n", portNum)
+				fmt.Printf("   👉 Windows PowerShell 终端执行:  Stop-Process -Id (Get-NetTCPConnection -LocalPort %s).OwningProcess -Force\n", portNum)
+			} else {
+				fmt.Printf("   👉 macOS/Linux 终端执行:         kill -9 $(lsof -ti :%s -sTCP:LISTEN)\n", portNum)
+			}
+			fmt.Printf("   👉 或者修改 config.json 中的 \"port\": \":8081\" 更换为其它未占用端口\n")
+			fmt.Println(strings.Repeat("=", 78) + "\n")
+
+			// 若在桌面双击运行 (无终端黑框模式)，弹出系统原生警告框
+			tray.ShowAlert("端口被占用 - Godeniter", fmt.Sprintf(
+				"端口 %s 已被占用，启动失败！\n\n如需一键释放端口，请在终端执行：\nkill -9 $(lsof -ti :%s -sTCP:LISTEN)\n\n或修改 config.json 更改端口。",
+				cfg.App.Port, portNum,
+			))
+			os.Exit(1)
+		}
+
+		// 2. 将自身 PID 写入文件，方便与 daemon stop / start 统一管理
+		pid := os.Getpid()
+		_ = os.WriteFile(cfg.App.PIDFile, []byte(strconv.Itoa(pid)), 0644)
+		defer func() {
+			_ = os.Remove(cfg.App.PIDFile)
+		}()
+
+		// 3. 异步启动 Web 服务
 		srv := &http.Server{
-			Addr:    cfg.App.Port,
 			Handler: app,
 		}
 		go func() {
-			if err := srv.ListenAndServe(); err != nil && err != http.ErrServerClosed {
+			if err := srv.Serve(ln); err != nil && err != http.ErrServerClosed {
 				fmt.Printf(">> [ERROR] Web 服务运行异常: %v\n", err)
 			}
 		}()
 
-		// 主线程运行跨平台桌面托盘与状态栏菜单 (阻塞至用户退出)
+		// 4. 自动唤起系统默认浏览器打开后台网址 (提供“双击有反应”的即时正向反馈)
+		go func() {
+			time.Sleep(150 * time.Millisecond)
+			_ = tray.OpenURL(webURL)
+		}()
+
+		// 5. 主线程运行跨平台桌面托盘与状态栏菜单 (阻塞至用户退出)
 		_ = tray.Run(tray.Options{
 			Title:       "Godeniter",
 			Tooltip:     fmt.Sprintf("%s (%s)", cfg.App.Name, cfg.App.Port),
@@ -224,6 +263,7 @@ func main() {
 				ctx, cancel := context.WithTimeout(context.Background(), 3*time.Second)
 				defer cancel()
 				_ = srv.Shutdown(ctx)
+				_ = os.Remove(cfg.App.PIDFile)
 				fmt.Println(">> [TRAY] 服务已成功安全停止。")
 			},
 		})
