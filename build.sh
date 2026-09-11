@@ -24,8 +24,41 @@ go build -ldflags="-s -w" -o ${OUTPUT_DIR}/app .
 
 chmod +x ${OUTPUT_DIR}/app || true
 
+# 如果在 macOS 系统上，自动组装无需终端弹窗的原生桌面应用包 (dist/Godeniter.app)
+if [[ "$OSTYPE" == "darwin"* ]]; then
+    echo ">> Packaging native macOS Status Bar App (dist/Godeniter.app)..."
+    APP_BUNDLE="${OUTPUT_DIR}/Godeniter.app"
+    mkdir -p "${APP_BUNDLE}/Contents/MacOS"
+    mkdir -p "${APP_BUNDLE}/Contents/Resources"
+    cp "${OUTPUT_DIR}/app" "${APP_BUNDLE}/Contents/MacOS/app"
+    chmod +x "${APP_BUNDLE}/Contents/MacOS/app"
+    cat << 'EOF' > "${APP_BUNDLE}/Contents/Info.plist"
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+    <key>CFBundleExecutable</key>
+    <string>app</string>
+    <key>CFBundleIdentifier</key>
+    <string>com.godeniter.starter</string>
+    <key>CFBundleName</key>
+    <string>Godeniter</string>
+    <key>CFBundlePackageType</key>
+    <string>APPL</string>
+    <key>CFBundleShortVersionString</key>
+    <string>1.0.2</string>
+    <key>LSUIElement</key>
+    <true/>
+</dict>
+</plist>
+EOF
+fi
+
 echo "=========================================================="
 echo " Build successful! Single binaries created in dist/:"
-echo "   - dist/app.exe      (Windows 统一全能二进制，桌面双击无黑框直达托盘，终端支持完整CLI)"
-echo "   - dist/app          (macOS/Linux 统一全能二进制)"
+echo "   - dist/app.exe        (Windows 统一全能二进制，桌面双击无黑框直达托盘，终端支持完整CLI)"
+echo "   - dist/app            (macOS/Linux 统一全能二进制，终端执行直接在顶部状态栏常驻)"
+if [[ "$OSTYPE" == "darwin"* ]]; then
+echo "   - dist/Godeniter.app  (macOS 原生状态栏应用，访达双击无黑框直达顶部菜单栏)"
+fi
 echo "=========================================================="
