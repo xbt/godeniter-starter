@@ -281,9 +281,11 @@ build.bat      # Windows
 ```
 
 生成的单文件无需安装任何环境，直接拷贝给客户，**统一且功能完备**：
+* `dist/app_tray.exe`：**Windows 纯静默桌面托盘客户端**
+  - 基于 Windows GUI 子系统构建，双击直接常驻屏幕右下角任务栏托盘，**100% 彻底无黑框、无闪烁**，右键唤出完整管理菜单；
 * `dist/app.exe`：**Windows 统一全能二进制**
-  - 在 CMD / PowerShell 中：支持 `start/status/stop/restart` 守护命令与前台日志；
-  - 桌面双击或以托盘模式运行：Windows 原生自动隐藏控制台黑框，常驻屏幕右下角托盘，提供完整右键菜单！
+  - 在 CMD / PowerShell 中：支持 `run/console` 调试与 `start/status/stop/restart` 守护进程管理；
+  - 桌面双击直接运行：自动隐藏控制台黑框进入右下角托盘；
 * `dist/app`：**macOS / Linux 统一全能二进制**（支持 CLI 运维与顶部状态栏托盘）。
 
 ---

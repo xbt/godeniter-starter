@@ -8,6 +8,7 @@ import (
 	"io/fs"
 	"net/http"
 	"os"
+	"runtime"
 	"strings"
 	"time"
 
@@ -160,11 +161,12 @@ func main() {
 	app := setupApp(cfg)
 
 	// 3. 命令行参数与运行模式判定:
-	// - 无参数直接运行: 默认采用控制台前台模式 (实时输出彩色 ASCII Banner 与请求日志)
 	// - 显式子命令:
-	//     tray: 桌面系统托盘模式 (Win32 原生自动隐藏黑框，macOS 顶部状态栏常驻)
-	//     console / run: 显式前台控制台调试模式
+	//     tray: 强制桌面系统托盘模式 (Win32 原生自动隐藏黑框，macOS 顶部状态栏常驻)
+	//     console / run: 显式前台控制台调试模式 (输出彩色 ASCII Banner 与实时请求日志)
 	//     start / stop / restart / status: 后台守护进程管理器接管
+	// - 无参数直接运行 (如 Windows / macOS 桌面双击):
+	//     默认以系统托盘模式启动，Win32 原生自动隐藏黑框！
 	cmd := ""
 	if len(os.Args) > 1 {
 		cmd = strings.ToLower(os.Args[1])
@@ -179,8 +181,12 @@ func main() {
 	case "start", "stop", "restart", "status":
 		isTrayMode = false
 	default:
-		// 命令行无参数直接运行：默认采用开发者控制台模式 (实时输出彩色 ASCII Banner 与请求日志)
-		isTrayMode = false
+		// 如果文件名包含 tray (如 app_tray.exe)，或在具备图形界面的操作系统 (Windows / macOS) 下双击无参数运行，默认进入系统托盘模式
+		if strings.Contains(strings.ToLower(os.Args[0]), "tray") || runtime.GOOS == "windows" || runtime.GOOS == "darwin" {
+			isTrayMode = true
+		} else {
+			isTrayMode = false
+		}
 	}
 
 	if isTrayMode {
@@ -202,13 +208,14 @@ func main() {
 
 		// 主线程运行跨平台桌面托盘与状态栏菜单 (阻塞至用户退出)
 		_ = tray.Run(tray.Options{
-			Title:     "Godeniter",
-			Tooltip:   fmt.Sprintf("%s (%s)", cfg.App.Name, cfg.App.Port),
-			IconBytes: appIcoBytes,
-			URL:       webURL,
-			AppDir:    tray.GetExecutableDir(),
-			Version:   "v1.0.0",
-			Port:      cfg.App.Port,
+			Title:       "Godeniter",
+			Tooltip:     fmt.Sprintf("%s (%s)", cfg.App.Name, cfg.App.Port),
+			IconBytes:   appIcoBytes,
+			URL:         webURL,
+			AppDir:      tray.GetExecutableDir(),
+			Version:     "v1.0.1",
+			Port:        cfg.App.Port,
+			HideConsole: true,
 			OnExit: func() {
 				fmt.Println("\n>> [TRAY] 收到退出指令，正在安全平滑关闭 Web 服务...")
 				ctx, cancel := context.WithTimeout(context.Background(), 3*time.Second)
