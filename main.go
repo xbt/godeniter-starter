@@ -157,6 +157,9 @@ func setupApp(cfg *config.Config) *godeniter.Engine {
 }
 
 func main() {
+	// macOS 严格要求所有 AppKit GUI 必须在主操作系统线程 (Thread 0) 执行，必须在 main 首行锁定
+	runtime.LockOSThread()
+
 	// 0. 若当前通过 macOS .app Bundle 启动，自动将工作目录修正为 .app 所在同级目录
 	if exe, err := os.Executable(); err == nil {
 		if strings.Contains(exe, ".app/Contents/MacOS") {
